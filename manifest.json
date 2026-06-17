@@ -1,0 +1,16 @@
+{
+  "name": "FIC Staff Portal",
+  "short_name": "FIC App",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#2563eb",
+  "theme_color": "#2563eb",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/583/583921.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
