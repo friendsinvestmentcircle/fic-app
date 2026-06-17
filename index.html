@@ -1,97 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FIC Staff Portal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="manifest" href="manifest.json">
-    <style>
-        .fade-in { animation: fadeIn 0.2s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIC Members Lookup</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans min-h-screen pb-12">
+<body>
 
-    <header class="bg-blue-600 text-white sticky top-0 z-50 shadow-md px-4 py-4">
-        <h1 class="text-xl font-bold tracking-wide">FIC Staff Portal</h1>
-    </header>
+  <div class="app-container">
+    
+    <div class="header-container">
+      <h1 class="header-title">MEMBER LOOKUP</h1>
+      <p class="header-subtitle">Members Lookup</p>
+    </div>
 
-    <main class="max-w-md mx-auto p-4 space-y-4">
+    <div class="search-wrapper">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Search by Name or Associate Code" 
+        autofocus 
+        class="search-input"
+      >
+      <button id="clear-search" class="clear-btn" title="Clear search">×</button>
+    </div>
+
+    <div id="result-count" class="result-count hidden"></div>
+
+    <div id="loading-spinner" class="status-message hidden">Searching directory...</div>
+
+    <div id="results-container" class="results-list"></div>
+
+  </div>
+
+  <script>
+    // CRITICAL configuration link pointing directly to your Google Server API 
+    const APPS_SCRIPT_WEBAPP_URL = "YOUR_DEPLOYED_APPS_SCRIPT_WEB_APP_URL";
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const searchInput = document.getElementById('search-input');
+      const clearBtn = document.getElementById('clear-search');
+      const countHeader = document.getElementById('result-count');
+      const container = document.getElementById('results-container');
+      const loading = document.getElementById('loading-spinner');
+
+      // Requirement 3: Professional Date Formatter (01 Jul 2025)
+      function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) return dateString;
         
-        <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-2">Member Lookup</h2>
-            <div class="relative">
-                <input 
-                    type="text" 
-                    id="search-input" 
-                    placeholder="Enter Name or ID..." 
-                    class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 pl-11 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                />
-                <svg class="absolute left-3 top-3.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        const day = String(date.getDate()).padStart(2, '0');
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
+      }
+
+      // Requirement 4: On-the-fly Membership Month Computations
+      function calculateMembershipMonths(dateString) {
+        if (!dateString) return "0 months";
+        const joinDate = new Date(dateString);
+        if (isNaN(joinDate.getTime())) return "N/A";
+        
+        const today = new Date();
+        const yearsDifference = today.getFullYear() - joinDate.getFullYear();
+        const monthsDifference = today.getMonth() - joinDate.getMonth();
+        
+        const totalMonths = (yearsDifference * 12) + monthsDifference;
+        return `${Math.max(0, totalMonths)} months`;
+      }
+
+      // Requirement 5: Explicit Clickable Mobile Formatter With Safe Prefix Injection
+      function formatMobile(phoneString) {
+        let cleanNumber = String(phoneString).replace(/\D/g, '');
+        if (!cleanNumber) return "N/A";
+        if (!cleanNumber.startsWith('880') && !cleanNumber.startsWith('60') && !cleanNumber.startsWith('1')) {
+           return `+${cleanNumber}`;
+        }
+        return `+${cleanNumber}`;
+      }
+
+      // Main UI Paint Loop
+      function renderResults(results) {
+        if (loading) loading.classList.add('hidden');
+        container.innerHTML = '';
+
+        // Requirement 8: Explicit Empty Results Fallback State 
+        if (!results || results.length === 0) {
+          countHeader.classList.add('hidden');
+          container.innerHTML = '<div class="status-message">No member found.</div>';
+          return;
+        }
+
+        // Requirement 7: Result Count Display Evaluation
+        countHeader.textContent = `${results.length} ${results.length === 1 ? 'Member' : 'Members'} Found`;
+        countHeader.classList.remove('hidden');
+
+        // Requirement 2: Swapped Visual Hierarchy Pipeline
+        container.innerHTML = results.map(member => {
+          const displayedPhone = formatMobile(member.mobile);
+          return `
+            <div class="member-card">
+              <h2 class="member-name">${member.name}</h2>
+              <div class="member-meta">
+                <div class="meta-row"><span class="meta-label">Member Code:</span> <span class="meta-value">${member.code}</span></div>
+                <div class="meta-row"><span class="meta-label">Join Date:</span> <span class="meta-value">${formatDate(member.joinDate)}</span></div>
+                <div class="meta-row"><span class="meta-label">Membership Months:</span> <span class="meta-value">${calculateMembershipMonths(member.joinDate)}</span></div>
+                <div class="meta-row">
+                  <span class="meta-label">Mobile:</span> 
+                  <span class="meta-value">
+                    <a href="tel:${displayedPhone}" class="phone-link" onclick="event.stopPropagation();">${displayedPhone}</a>
+                  </span>
+                </div>
+              </div>
             </div>
-        </section>
+          `;
+        }).join('');
+      }
 
-        <div id="loading" class="hidden flex justify-center py-6">
-            <div class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
-        </div>
-
-        <div id="display-container" class="space-y-4"></div>
-
-    </main>
-
-    <script>
-        // ⚠️ REPLACE WITH YOUR ACTUAL GOOGLE APPS SCRIPT URL ⚠️
-        const API_URL = "https://script.google.com/macros/s/AKfycbzjTEnpKymNuTAk96JXouXDIEl91aL7xd5SmEBGl81-HmwCrdV-n3K9ZQ3dWDQJXHkg/exec"; 
-
-        const searchInput = document.getElementById('search-input');
-        const loading = document.getElementById('loading');
-        const container = document.getElementById('display-container');
-
-        searchInput.addEventListener('input', async (e) => {
-            const query = e.target.value.trim();
-            if (query.length < 2) { container.innerHTML = ''; return; }
-
-            loading.classList.remove('hidden');
-            try {
-                const response = await fetch(`${API_URL}?action=search&q=${encodeURIComponent(query)}`);
-                const data = await response.json();
-                renderResults(data.results);
-            } catch (err) {
-                container.innerHTML = `<div class="p-4 bg-red-100 text-red-700 rounded-xl text-sm">Error: Unable to connect to server.</div>`;
-            } finally {
-                loading.classList.add('hidden');
-            }
-        });
-
-        function renderResults(results) {
-            container.innerHTML = '';
-            if (!results || results.length === 0) {
-                container.innerHTML = `<div class="text-center py-8 text-gray-400 text-sm">No members found.</div>`;
-                return;
-            }
-
-            results.forEach(member => {
-                const card = document.createElement('div');
-                card.className = "bg-white p-5 rounded-2xl shadow-sm border border-gray-100 fade-in";
-                card.innerHTML = `
-                    <div class="text-xs font-bold text-blue-600 uppercase tracking-wider">${member.Code}</div>
-                    <h3 class="text-xl font-bold text-gray-900 mt-1">${member.Name}</h3>
-                    <div class="mt-4 grid grid-cols-2 gap-y-3 text-sm">
-                        <div><span class="block text-gray-400 uppercase text-[10px]">Location</span>${member.Location}</div>
-                        <div><span class="block text-gray-400 uppercase text-[10px]">Mobile</span><a href="tel:${member.Phone}" class="text-blue-600">${member.Phone}</a></div>
-                        <div><span class="block text-gray-400 uppercase text-[10px]">Join Date</span>${member.joinDate}</div>
-                        <div><span class="block text-gray-400 uppercase text-[10px]">Membership</span>${member.membershipMonth} ${member.membershipYear}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+      function performSearch(query) {
+        const cleanQuery = query.trim();
+        
+        if (cleanQuery === '') {
+          container.innerHTML = '';
+          countHeader.classList.add('hidden');
+          clearBtn.style.display = 'none';
+          if (loading) loading.classList.add('hidden');
+          return;
         }
 
-        // Service Worker Registration for PWA
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(console.error);
-        }
-    </script>
+        // Display the cancellation utility option
+        clearBtn.style.display = 'flex';
+        if (loading) loading.classList.remove('hidden');
+
+        // PWA Engine Execution via Fetch directly routing to Apps Script Cloud Endpoints
+        fetch(`${APPS_SCRIPT_WEBAPP_URL}?q=${encodeURIComponent(cleanQuery)}`)
+          .then(response => response.json())
+          .then(data => renderResults(data))
+          .catch(error => {
+            console.error("Directory fetching execution error:", error);
+            if (loading) loading.classList.add('hidden');
+            container.innerHTML = '<div class="status-message" style="color:#ef4444;">Error accessing data directory.</div>';
+          });
+      }
+
+      // Debounce logic wrapper to prevent resource thrashing
+      function debounce(func, delay) {
+        let timeoutId;
+        return (...args) => {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => func(...args), delay);
+        };
+      }
+
+      // Input Field Events Configuration
+      searchInput.addEventListener('input', debounce((e) => {
+        performSearch(e.target.value);
+      }, 300));
+
+      // Requirement 1: Clear Field Button Actions Setup
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        performSearch('');
+        searchInput.focus();
+      });
+    });
+
+    // PWA Service Worker Hook Architecture initialization
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js')
+          .then(reg => console.log('Service Worker Registered Successfully.', reg.scope))
+          .catch(err => console.error('Service Worker Registry Blocked:', err));
+      });
+    }
+  </script>
 </body>
 </html>
