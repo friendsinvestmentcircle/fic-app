@@ -36,8 +36,8 @@
   </div>
 
   <script>
-    // CRITICAL configuration link pointing directly to your Google Server API 
-    const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbytyy7wzSGraYIsWEjc8ekUi_R6l51DKQqtgTVdn38Vc2-5I7mnSUwzyxxgAtpbite1uw/exec";
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BETWEEN THESE QUOTES:
+    const APPS_SCRIPT_WEBAPP_URL = "YOUR_DEPLOYED_APPS_SCRIPT_WEB_APP_URL";
 
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('search-input');
@@ -46,18 +46,18 @@
       const container = document.getElementById('results-container');
       const loading = document.getElementById('loading-spinner');
 
-      // Requirement 3: Professional Date Formatter (01 Jul 2025)
+      // 6. Formats Date format strings to a professional design layout (e.g., 01 Jul 2025)
       function formatDate(dateString) {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString;
+        if (isNaN(date.getTime())) return dateString; // Fallback if data is already a string like "July 2025"
         
         const day = String(date.getDate()).padStart(2, '0');
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
       }
 
-      // Requirement 4: On-the-fly Membership Month Computations
+      // 7. Calculates active Membership Months dynamically
       function calculateMembershipMonths(dateString) {
         if (!dateString) return "0 months";
         const joinDate = new Date(dateString);
@@ -71,40 +71,33 @@
         return `${Math.max(0, totalMonths)} months`;
       }
 
-      // Requirement 5: Explicit Clickable Mobile Formatter With Safe Prefix Injection
-      function formatMobile(phoneString) {
-        let cleanNumber = String(phoneString).replace(/\D/g, '');
-        if (!cleanNumber) return "N/A";
-        if (!cleanNumber.startsWith('880') && !cleanNumber.startsWith('60') && !cleanNumber.startsWith('1')) {
-           return `+${cleanNumber}`;
-        }
-        return `+${cleanNumber}`;
-      }
-
-      // Main UI Paint Loop
+      // 8. Visual Content Generator Component Loop
       function renderResults(results) {
         if (loading) loading.classList.add('hidden');
         container.innerHTML = '';
 
-        // Requirement 8: Explicit Empty Results Fallback State 
+        // Handle completely empty results array
         if (!results || results.length === 0) {
           countHeader.classList.add('hidden');
           container.innerHTML = '<div class="status-message">No member found.</div>';
           return;
         }
 
-        // Requirement 7: Result Count Display Evaluation
+        // Show total found counter layout
         countHeader.textContent = `${results.length} ${results.length === 1 ? 'Member' : 'Members'} Found`;
         countHeader.classList.remove('hidden');
 
-        // Requirement 2: Swapped Visual Hierarchy Pipeline
+        // Draw structural member layout components onto screen
         container.innerHTML = results.map(member => {
-          const displayedPhone = formatMobile(member.mobile);
+          const cleanDigits = String(member.mobile).replace(/\D/g, '');
+          const displayedPhone = `+${cleanDigits}`;
+
           return `
             <div class="member-card">
               <h2 class="member-name">${member.name}</h2>
               <div class="member-meta">
                 <div class="meta-row"><span class="meta-label">Member Code:</span> <span class="meta-value">${member.code}</span></div>
+                <div class="meta-row"><span class="meta-label">Location:</span> <span class="meta-value">${member.location || 'N/A'}</span></div>
                 <div class="meta-row"><span class="meta-label">Join Date:</span> <span class="meta-value">${formatDate(member.joinDate)}</span></div>
                 <div class="meta-row"><span class="meta-label">Membership Months:</span> <span class="meta-value">${calculateMembershipMonths(member.joinDate)}</span></div>
                 <div class="meta-row">
@@ -130,22 +123,21 @@
           return;
         }
 
-        // Display the cancellation utility option
         clearBtn.style.display = 'flex';
         if (loading) loading.classList.remove('hidden');
 
-        // PWA Engine Execution via Fetch directly routing to Apps Script Cloud Endpoints
+        // Direct cross-domain fetch connection to Apps Script Web App Endpoint
         fetch(`${APPS_SCRIPT_WEBAPP_URL}?q=${encodeURIComponent(cleanQuery)}`)
           .then(response => response.json())
           .then(data => renderResults(data))
           .catch(error => {
-            console.error("Directory fetching execution error:", error);
+            console.error("Inbound directory query failure:", error);
             if (loading) loading.classList.add('hidden');
             container.innerHTML = '<div class="status-message" style="color:#ef4444;">Error accessing data directory.</div>';
           });
       }
 
-      // Debounce logic wrapper to prevent resource thrashing
+      // Input performance handling wrapper
       function debounce(func, delay) {
         let timeoutId;
         return (...args) => {
@@ -154,12 +146,11 @@
         };
       }
 
-      // Input Field Events Configuration
       searchInput.addEventListener('input', debounce((e) => {
         performSearch(e.target.value);
       }, 300));
 
-      // Requirement 1: Clear Field Button Actions Setup
+      // Clear layout and return focus hook
       clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         performSearch('');
@@ -167,12 +158,12 @@
       });
     });
 
-    // PWA Service Worker Hook Architecture initialization
+    // PWA Service Worker Registration Hook
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker Registered Successfully.', reg.scope))
-          .catch(err => console.error('Service Worker Registry Blocked:', err));
+          .then(reg => console.log('Service Worker Registered.', reg.scope))
+          .catch(err => console.error('Service Worker Registration Failed:', err));
       });
     }
   </script>
