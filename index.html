@@ -58,16 +58,16 @@
 
       // Calculates active Membership Months dynamically
       function calculateMembershipMonths(dateString) {
-        if (!dateString) return "0 months";
-        const joinDate = new Date(dateString);
-        if (isNaN(joinDate.getTime())) return "N/A";
-        
-        const today = new Date();
-        const yearsDifference = today.getFullYear() - joinDate.getFullYear();
-        const monthsDifference = today.getMonth() - joinDate.getMonth();
-        
-        const totalMonths = (yearsDifference * 12) + monthsDifference;
-        return `${Math.max(0, totalMonths)} months`;
+      if (!dateString) return "0 months";
+      const joinDate = new Date(dateString);
+      if (isNaN(joinDate.getTime())) return "N/A";
+  
+      const today = new Date();
+      const yearsDifference = today.getFullYear() - joinDate.getFullYear();
+      const monthsDifference = today.getMonth() - joinDate.getMonth();
+  
+      const totalMonths = (yearsDifference * 12) + monthsDifference + 1;
+      return `${Math.max(0, totalMonths)} months`;
       }
 
       // Visual Content Generator Component Loop
