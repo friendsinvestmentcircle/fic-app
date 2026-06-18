@@ -206,10 +206,27 @@
       performSearch('');
     });
 
+    // Replace the service worker block at the bottom with this version:
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js')
-          .then(reg => console.log('Service Worker Registered.', reg.scope))
+          .then(reg => {
+            console.log('Service Worker Registered.', reg.scope);
+            
+            // Listen for a newly pushed update
+            reg.onupdatefound = () => {
+              const installingWorker = reg.installing;
+              installingWorker.onstatechange = () => {
+                if (installingWorker.state === 'installed') {
+                  if (navigator.serviceWorker.controller) {
+                    // New version successfully downloaded in background; flash-reload the app!
+                    console.log('New layout update detected. Hot swapping assets...');
+                    window.location.reload();
+                  }
+                }
+              };
+            };
+          })
           .catch(err => console.error('Service Worker Registration Failed:', err));
       });
     }
