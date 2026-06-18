@@ -38,24 +38,37 @@
     <div id="results-container" class="results-list"></div>
 
   </div>
-
+  
+  <!-- Detailed Profile Modal Sheet Overlay -->
+  <div id="details-modal" class="modal-overlay hidden">
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 id="modal-member-name" class="modal-title-en">Member Profile</h2>
+        <button id="close-modal" class="modal-close-btn">×</button>
+      </div>
+      <div id="modal-details-content" class="modal-body"></div>
+    </div>
+  </div>
+  
   <script>
     // PASTE YOUR FRESHLY COPIED GOOGLE APPS SCRIPT WEB APP URL HERE:
     const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbytyy7wzSGraYIsWEjc8ekUi_R6l51DKQqtgTVdn38Vc2-5I7mnSUwzyxxgAtpbite1uw/exec";
-
+    let cachedMembersData = [];
+    
     document.addEventListener('DOMContentLoaded', () => {
       const searchInput = document.getElementById('search-input');
       const clearBtn = document.getElementById('clear-search');
       const countHeader = document.getElementById('result-count');
       const container = document.getElementById('results-container');
       const loading = document.getElementById('loading-spinner');
+      const modal = document.getElementById('details-modal');
+      const modalBody = document.getElementById('modal-details-content');
+      const closeModalBtn = document.getElementById('close-modal');
 
-      // Formats Date strings professionally (e.g., 01 Jul 2025)
       function formatDate(dateString) {
         if (!dateString) return "N/A";
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return dateString; 
-        
         const day = String(date.getDate()).padStart(2, '0');
         const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
         return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
@@ -66,32 +79,56 @@
         if (!dateString) return 0;
         const joinDate = new Date(dateString);
         if (isNaN(joinDate.getTime())) return 0;
-        
         const today = new Date();
         const yearsDifference = today.getFullYear() - joinDate.getFullYear();
         const monthsDifference = today.getMonth() - joinDate.getMonth();
-        
-        const totalMonths = (yearsDifference * 12) + monthsDifference + 1;
-        return Math.max(0, totalMonths);
+        return Math.max(0, (yearsDifference * 12) + monthsDifference + 1);
       }
 
       // Formats display numbers cleanly 
       function formatDisplayPhone(phoneString) {
         let digits = String(phoneString).replace(/\D/g, '');
-        // If it already has country prefixes like 880 or 60, don't double append them
-        if (digits.startsWith('880') || digits.startsWith('60')) {
-          return `+${digits}`;
-        }
-        // If it's a local number without a prefix, preserve it cleanly
-        if (digits.startsWith('0')) {
-          return digits;
-        }
+        if (digits.startsWith('880') || digits.startsWith('60')) return `+${digits}`;
+        if (digits.startsWith('0')) return digits;
         return `+${digits}`;
       }
+
+      window.showMemberDetails = (index) => {
+        const member = cachedMembersData[index];
+        if (!member) return;
+
+        const monthsCount = getMembershipMonthsCount(member.joinDate);
+        const formattedSavings = `৳ ${(monthsCount * 300).toLocaleString('en-US')}`;
+        const printablePhone = formatDisplayPhone(member.mobile);
+
+        document.getElementById('modal-member-name').textContent = member.name;
+        
+        modalBody.innerHTML = `
+          <div class="modal-scroll-wrapper">
+            ${member.nameBn ? `<div class="modal-subtitle-bn">${member.nameBn}</div>` : ''}
+            <div class="modal-info-grid">
+              <div class="modal-info-item"><span class="modal-info-label">Designation</span><span class="modal-info-val">${member.designation || 'Associate'} (${member.designationBn || 'সদস্য'})</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Member Code</span><span class="modal-info-val">${member.code}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Location</span><span class="modal-info-val">${member.location || 'N/A'}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Membership</span><span class="modal-info-val">${monthsCount} Months</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Total Savings</span><span class="modal-info-val Highlight-savings">${formattedSavings}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Mobile Number</span><span class="modal-info-val"><a href="tel:${printablePhone}" class="phone-link">${printablePhone}</a></span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Blood Group</span><span class="modal-info-val">${member.bloodGroup || 'N/A'}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">NID Number</span><span class="modal-info-val">${member.nidNo || 'N/A'}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Father's Name</span><span class="modal-info-val">${member.fatherName || 'N/A'}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Mother's Name</span><span class="modal-info-val">${member.motherName || 'N/A'}</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Nominee Name</span><span class="modal-info-val">${member.nomineeName || 'N/A'} (${member.relationship || 'N/A'})</span></div>
+              <div class="modal-info-item"><span class="modal-info-label">Join Date Record</span><span class="modal-info-val">${formatDate(member.joinDate)}</span></div>
+            </div>
+          </div>
+        `;
+        modal.classList.remove('hidden');
+      };
 
       function renderResults(results) {
         if (loading) loading.classList.add('hidden');
         container.innerHTML = '';
+        cachedMembersData = results;
 
         if (!results || results.length === 0) {
           countHeader.classList.add('hidden');
@@ -102,44 +139,30 @@
         countHeader.textContent = `${results.length} ${results.length === 1 ? 'Member' : 'Members'} Found`;
         countHeader.classList.remove('hidden');
 
-        container.innerHTML = results.map(member => {
+        container.innerHTML = results.map((member, index) => {
           const printablePhone = formatDisplayPhone(member.mobile);
-          // For system dialers, make sure it has the leading '+' prefix
           const dialerPhone = printablePhone.startsWith('+') ? printablePhone : `+88${printablePhone}`;
-
           const monthsCount = getMembershipMonthsCount(member.joinDate);
-          const savingsAmount = monthsCount * 300;
-          const formattedSavings = `৳ ${savingsAmount.toLocaleString('en-US')}`;
+          const formattedSavings = `৳ ${(monthsCount * 300).toLocaleString('en-US')}`;
+          const isBengali = /[\u0980-\u09FF]/.test(member.name);
 
           return `
-            <div class="member-card">
+            <div class="member-card" onclick="showMemberDetails(${index})">
               <div class="names-block">
-                <h2 class="member-name-en">${member.name}</h2>
+                <h2 class="${isBengali ? 'member-name-bn' : 'member-name-en'}">${member.name}</h2>
                 ${member.nameBn ? `<h3 class="member-name-bn">${member.nameBn}</h3>` : ''}
               </div>
               <div class="member-meta">
+                <div class="meta-row"><span class="meta-label">Member Code</span><span class="meta-value">${member.code}</span></div>
+                <div class="meta-row"><span class="meta-label">Location</span><span class="meta-value">${member.location || 'N/A'}</span></div>
+                <div class="meta-row"><span class="meta-label">Membership</span><span class="meta-value">${monthsCount} ${monthsCount === 1 ? 'Month' : 'Months'}</span></div>
                 <div class="meta-row">
-                  <span class="meta-label">Member Code</span> 
-                  <span class="meta-value">${member.code}</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-label">Location</span> 
-                  <span class="meta-value">${member.location || 'N/A'}</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-label">Join Date</span> 
-                  <span class="meta-value">${formatDate(member.joinDate)}</span>
-                </div>
-                <div class="meta-row">
-                  <span class="meta-label">Mobile</span> 
+                  <span class="meta-label">Mobile</span>
                   <span class="meta-value">
                     <a href="tel:${dialerPhone}" class="phone-link" onclick="event.stopPropagation();">${printablePhone}</a>
                   </span>
                 </div>
-                <div class="meta-row">
-                  <span class="meta-label">Total Savings</span> 
-                  <span class="meta-value-savings">${formattedSavings}</span>
-                </div>
+                <div class="meta-row"><span class="meta-label">Total Savings</span><span class="meta-value-savings">${formattedSavings}</span></div>
               </div>
             </div>
           `;
@@ -148,13 +171,7 @@
 
       function performSearch(query) {
         const cleanQuery = query.trim();
-        
-        if (cleanQuery === '') {
-          clearBtn.style.display = 'none';
-        } else {
-          clearBtn.style.display = 'flex';
-        }
-
+        clearBtn.style.display = cleanQuery === '' ? 'none' : 'flex';
         if (loading) loading.classList.remove('hidden');
 
         fetch(`${APPS_SCRIPT_WEBAPP_URL}?q=${encodeURIComponent(cleanQuery)}`)
@@ -175,17 +192,17 @@
         };
       }
 
-      searchInput.addEventListener('input', debounce((e) => {
-        performSearch(e.target.value);
-      }, 300));
-
+      searchInput.addEventListener('input', debounce((e) => performSearch(e.target.value), 300));
+      
       clearBtn.addEventListener('click', () => {
         searchInput.value = '';
         performSearch('');
         searchInput.focus();
       });
 
-      // Automated initialization call
+      closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+
       performSearch('');
     });
 
