@@ -11,10 +11,12 @@
 
   <div class="app-container">
     
+    <!-- Search Header -->
     <div class="header-container">
       <h1 class="header-title">MEMBERS LOOKUP</h1>
     </div>
 
+    <!-- Search Input Box -->
     <div class="search-wrapper">
       <input 
         type="text" 
@@ -26,16 +28,19 @@
       <button id="clear-search" class="clear-btn" title="Clear search">×</button>
     </div>
 
+    <!-- Result Count Header -->
     <div id="result-count" class="result-count hidden"></div>
 
+    <!-- Loading State View -->
     <div id="loading-spinner" class="status-message hidden">Searching directory...</div>
 
+    <!-- Search Results Target Container -->
     <div id="results-container" class="results-list"></div>
 
   </div>
 
   <script>
-    // PASTE YOUR NEW GOOGLE APPS SCRIPT WEB APP URL BETWEEN THESE QUOTES:
+    // PASTE YOUR FRESHLY COPIED GOOGLE APPS SCRIPT WEB APP URL HERE:
     const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbytyy7wzSGraYIsWEjc8ekUi_R6l51DKQqtgTVdn38Vc2-5I7mnSUwzyxxgAtpbite1uw/exec";
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -56,21 +61,34 @@
         return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
       }
 
-      // Calculates active Membership Months dynamically
-      function calculateMembershipMonths(dateString) {
-      if (!dateString) return "0 months";
-      const joinDate = new Date(dateString);
-      if (isNaN(joinDate.getTime())) return "N/A";
-  
-      const today = new Date();
-      const yearsDifference = today.getFullYear() - joinDate.getFullYear();
-      const monthsDifference = today.getMonth() - joinDate.getMonth();
-  
-      const totalMonths = (yearsDifference * 12) + monthsDifference + 1;
-      return `${Math.max(0, totalMonths)} months`;
+      // Calculates inclusive tracking timeline lengths
+      function getMembershipMonthsCount(dateString) {
+        if (!dateString) return 0;
+        const joinDate = new Date(dateString);
+        if (isNaN(joinDate.getTime())) return 0;
+        
+        const today = new Date();
+        const yearsDifference = today.getFullYear() - joinDate.getFullYear();
+        const monthsDifference = today.getMonth() - joinDate.getMonth();
+        
+        const totalMonths = (yearsDifference * 12) + monthsDifference + 1;
+        return Math.max(0, totalMonths);
       }
 
-      // Visual Content Generator Component Loop
+      // Formats display numbers cleanly 
+      function formatDisplayPhone(phoneString) {
+        let digits = String(phoneString).replace(/\D/g, '');
+        // If it already has country prefixes like 880 or 60, don't double append them
+        if (digits.startsWith('880') || digits.startsWith('60')) {
+          return `+${digits}`;
+        }
+        // If it's a local number without a prefix, preserve it cleanly
+        if (digits.startsWith('0')) {
+          return digits;
+        }
+        return `+${digits}`;
+      }
+
       function renderResults(results) {
         if (loading) loading.classList.add('hidden');
         container.innerHTML = '';
@@ -85,22 +103,42 @@
         countHeader.classList.remove('hidden');
 
         container.innerHTML = results.map(member => {
-          const cleanDigits = String(member.mobile).replace(/\D/g, '');
-          const displayedPhone = `+${cleanDigits}`;
+          const printablePhone = formatDisplayPhone(member.mobile);
+          // For system dialers, make sure it has the leading '+' prefix
+          const dialerPhone = printablePhone.startsWith('+') ? printablePhone : `+88${printablePhone}`;
+
+          const monthsCount = getMembershipMonthsCount(member.joinDate);
+          const savingsAmount = monthsCount * 300;
+          const formattedSavings = `৳ ${savingsAmount.toLocaleString('en-US')}`;
 
           return `
             <div class="member-card">
-              <h2 class="member-name">${member.name}</h2>
+              <div class="names-block">
+                <h2 class="member-name-en">${member.name}</h2>
+                ${member.nameBn ? `<h3 class="member-name-bn">${member.nameBn}</h3>` : ''}
+              </div>
               <div class="member-meta">
-                <div class="meta-row"><span class="meta-label">Member Code:</span> <span class="meta-value">${member.code}</span></div>
-                <div class="meta-row"><span class="meta-label">Location:</span> <span class="meta-value">${member.location || 'N/A'}</span></div>
-                <div class="meta-row"><span class="meta-label">Join Date:</span> <span class="meta-value">${formatDate(member.joinDate)}</span></div>
-                <div class="meta-row"><span class="meta-label">Membership Months:</span> <span class="meta-value">${calculateMembershipMonths(member.joinDate)}</span></div>
                 <div class="meta-row">
-                  <span class="meta-label">Mobile:</span> 
+                  <span class="meta-label">Member Code</span> 
+                  <span class="meta-value">${member.code}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Location</span> 
+                  <span class="meta-value">${member.location || 'N/A'}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Join Date</span> 
+                  <span class="meta-value">${formatDate(member.joinDate)}</span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Mobile</span> 
                   <span class="meta-value">
-                    <a href="tel:${displayedPhone}" class="phone-link" onclick="event.stopPropagation();">${displayedPhone}</a>
+                    <a href="tel:${dialerPhone}" class="phone-link" onclick="event.stopPropagation();">${printablePhone}</a>
                   </span>
+                </div>
+                <div class="meta-row">
+                  <span class="meta-label">Total Savings</span> 
+                  <span class="meta-value-savings">${formattedSavings}</span>
                 </div>
               </div>
             </div>
@@ -111,7 +149,6 @@
       function performSearch(query) {
         const cleanQuery = query.trim();
         
-        // Show or hide clear button depending on whether input has text
         if (cleanQuery === '') {
           clearBtn.style.display = 'none';
         } else {
@@ -120,7 +157,6 @@
 
         if (loading) loading.classList.remove('hidden');
 
-        // Fetch query execution (empty string routes to complete list download)
         fetch(`${APPS_SCRIPT_WEBAPP_URL}?q=${encodeURIComponent(cleanQuery)}`)
           .then(response => response.json())
           .then(data => renderResults(data))
@@ -145,11 +181,11 @@
 
       clearBtn.addEventListener('click', () => {
         searchInput.value = '';
-        performSearch(''); // Instantly shows all members again on click
+        performSearch('');
         searchInput.focus();
       });
 
-      // AUTO-RUN ON PAGE LOAD: Fetches all members immediately when opening the app
+      // Automated initialization call
       performSearch('');
     });
 
