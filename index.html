@@ -1,231 +1,110 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FIC Members Lookup</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
-  <div class="app-container">
-    
-    <!-- Search Header -->
-    <div class="header-container">
-      <h1 class="header-title">MEMBERS LOOKUP</h1>
-    </div>
-
-    <!-- Search Input Box -->
-    <div class="search-wrapper">
-      <input 
-        type="text" 
-        id="search-input" 
-        placeholder="Search by Name, Code or Number" 
-        autofocus 
-        class="search-input"
-      >
-      <button id="clear-search" class="clear-btn" title="Clear search">×</button>
-    </div>
-
-    <!-- Result Count Header -->
-    <div id="result-count" class="result-count hidden"></div>
-
-    <!-- Loading State View -->
-    <div id="loading-spinner" class="status-message hidden">Searching directory...</div>
-
-    <!-- Search Results Target Container -->
-    <div id="results-container" class="results-list"></div>
-
-  </div>
-  
-  <!-- Detailed Profile Modal Sheet Overlay -->
-  <div id="details-modal" class="modal-overlay hidden">
-    <div class="modal-sheet">
-      <div class="modal-header">
-        <h2 id="modal-member-name" class="modal-title-en">Member Profile</h2>
-        <button id="close-modal" class="modal-close-btn">×</button>
-      </div>
-      <div id="modal-details-content" class="modal-body"></div>
-    </div>
-  </div>
-  
-  <script>
-    // PASTE YOUR FRESHLY COPIED GOOGLE APPS SCRIPT WEB APP URL HERE:
-    const APPS_SCRIPT_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbytyy7wzSGraYIsWEjc8ekUi_R6l51DKQqtgTVdn38Vc2-5I7mnSUwzyxxgAtpbite1uw/exec";
-    let cachedMembersData = [];
-    
-    document.addEventListener('DOMContentLoaded', () => {
-      const searchInput = document.getElementById('search-input');
-      const clearBtn = document.getElementById('clear-search');
-      const countHeader = document.getElementById('result-count');
-      const container = document.getElementById('results-container');
-      const loading = document.getElementById('loading-spinner');
-      const modal = document.getElementById('details-modal');
-      const modalBody = document.getElementById('modal-details-content');
-      const closeModalBtn = document.getElementById('close-modal');
-
-      function formatDate(dateString) {
-        if (!dateString) return "N/A";
-        const date = new Date(dateString);
-        if (isNaN(date.getTime())) return dateString; 
-        const day = String(date.getDate()).padStart(2, '0');
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        return `${day} ${months[date.getMonth()]} ${date.getFullYear()}`;
-      }
-
-      // Calculates inclusive tracking timeline lengths
-      function getMembershipMonthsCount(dateString) {
-        if (!dateString) return 0;
-        const joinDate = new Date(dateString);
-        if (isNaN(joinDate.getTime())) return 0;
-        const today = new Date();
-        const yearsDifference = today.getFullYear() - joinDate.getFullYear();
-        const monthsDifference = today.getMonth() - joinDate.getMonth();
-        return Math.max(0, (yearsDifference * 12) + monthsDifference + 1);
-      }
-
-      // Formats display numbers cleanly 
-      function formatDisplayPhone(phoneString) {
-        let digits = String(phoneString).replace(/\D/g, '');
-        if (digits.startsWith('880') || digits.startsWith('60')) return `+${digits}`;
-        if (digits.startsWith('0')) return digits;
-        return `+${digits}`;
-      }
-
-      window.showMemberDetails = (index) => {
-        const member = cachedMembersData[index];
-        if (!member) return;
-
-        const monthsCount = getMembershipMonthsCount(member.joinDate);
-        const formattedSavings = `৳ ${(monthsCount * 300).toLocaleString('en-US')}`;
-        const printablePhone = formatDisplayPhone(member.mobile);
-
-        document.getElementById('modal-member-name').textContent = member.name;
-        
-        modalBody.innerHTML = `
-          <div class="modal-scroll-wrapper">
-            ${member.nameBn ? `<div class="modal-subtitle-bn">${member.nameBn}</div>` : ''}
-            <div class="modal-info-grid">
-              <div class="modal-info-item"><span class="modal-info-label">Designation</span><span class="modal-info-val">${member.designation || 'Associate'} (${member.designationBn || 'সদস্য'})</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Member Code</span><span class="modal-info-val">${member.code}</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Location</span><span class="modal-info-val">${member.location || 'N/A'}</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Membership</span><span class="modal-info-val">${monthsCount} Months</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Total Savings</span><span class="modal-info-val Highlight-savings">${formattedSavings}</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Mobile Number</span><span class="modal-info-val"><a href="tel:${printablePhone}" class="phone-link">${printablePhone}</a></span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Blood Group</span><span class="modal-info-val">${member.bloodGroup || 'N/A'}</span></div>
-              <div class="modal-info-item"><span class="modal-info-label">Join Date Record</span><span class="modal-info-val">${formatDate(member.joinDate)}</span></div>
+<!doctype html>
+<html lang="en" class="h-full">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <title>FIC Staff Portal</title>
+  </head>
+  <body class="h-full bg-slate-100 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
+    <div class="min-h-screen">
+      <header class="sticky top-0 z-20 border-b border-white/10 bg-white/80 px-4 py-4 backdrop-blur dark:bg-slate-950/80">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="flex items-center justify-between gap-3 sm:justify-start">
+            <div>
+              <h1 class="text-xl font-semibold">Home Dashboard</h1>
+              <p class="text-sm text-slate-500 dark:text-slate-400">All-time financial overview</p>
             </div>
           </div>
-        `;
-        modal.classList.remove('hidden');
-      };
+          <button id="themeBtn" class="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">Toggle Theme</button>
+        </div>
+      </header>
 
-      function renderResults(results) {
-        if (loading) loading.classList.add('hidden');
-        container.innerHTML = '';
-        cachedMembersData = results;
+      <main class="space-y-8 p-4 pb-24 lg:p-6 lg:pb-6">
+        <section>
+          <div class="section-title">Summary Cards</div>
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div class="card"><div class="metric-label">Total Balance</div><div class="metric-value" id="totalBalance">৳0</div></div>
+            <div class="card"><div class="metric-label">Total Income</div><div class="metric-value positive" id="totalIncome">৳0</div></div>
+            <div class="card"><div class="metric-label">Total Expense</div><div class="metric-value negative" id="totalExpense">৳0</div></div>
+            <div class="card"><div class="metric-label">Net Profit</div><div class="metric-value positive" id="netProfit">৳0</div></div>
+            <div class="card"><div class="metric-label">Total Members</div><div class="metric-value" id="totalMembers">0</div></div>
+            <div class="card"><div class="metric-label">Active Loans</div><div class="metric-value negative" id="activeLoans">৳0</div></div>
+          </div>
+        </section>
 
-        if (!results || results.length === 0) {
-          countHeader.classList.add('hidden');
-          container.innerHTML = '<div class="status-message">No member found.</div>';
-          return;
-        }
+        <section>
+          <div class="section-title">Profit Block</div>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="card"><div class="metric-label">Net Profit</div><div class="metric-value positive" id="profitNet">৳0</div><div class="metric-sub neutral">0% change</div></div>
+            <div class="card"><div class="metric-label">Monthly Profit</div><div class="metric-value positive" id="monthlyProfit">৳0</div></div>
+            <div class="card"><div class="metric-label">Yearly Profit</div><div class="metric-value positive" id="yearlyProfit">৳0</div></div>
+          </div>
+        </section>
 
-        countHeader.textContent = `${results.length} ${results.length === 1 ? 'Member' : 'Members'} Found`;
-        countHeader.classList.remove('hidden');
+        <section>
+          <div class="section-title">Loans Section</div>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <div class="card"><div class="metric-label">Loans Given</div><div class="metric-value" id="loansGiven">৳0</div></div>
+            <div class="card"><div class="metric-label">Loans Recovered</div><div class="metric-value positive" id="loansRecovered">৳0</div></div>
+            <div class="card"><div class="metric-label">Overdue Loans</div><div class="metric-value negative" id="overdueLoans">৳0</div></div>
+          </div>
+        </section>
 
-        container.innerHTML = results.map((member, index) => {
-          const printablePhone = formatDisplayPhone(member.mobile);
-          const dialerPhone = printablePhone.startsWith('+') ? printablePhone : `+88${printablePhone}`;
-          const monthsCount = getMembershipMonthsCount(member.joinDate);
-          const formattedSavings = `৳ ${(monthsCount * 300).toLocaleString('en-US')}`;
-          const isBengali = /[\u0980-\u09FF]/.test(member.name);
-
-          return `
-            <div class="member-card" onclick="showMemberDetails(${index})">
-              <div class="names-block">
-                <h2 class="${isBengali ? 'member-name-bn' : 'member-name-en'}">${member.name}</h2>
-                ${member.nameBn ? `<h3 class="member-name-bn">${member.nameBn}</h3>` : ''}
-              </div>
-              <div class="member-meta">
-                <div class="meta-row"><span class="meta-label">Member Code</span><span class="meta-value">${member.code}</span></div>
-                <div class="meta-row"><span class="meta-label">Location</span><span class="meta-value">${member.location || 'N/A'}</span></div>
-                <div class="meta-row"><span class="meta-label">Membership</span><span class="meta-value">${monthsCount} ${monthsCount === 1 ? 'Month' : 'Months'}</span></div>
-                <div class="meta-row">
-                  <span class="meta-label">Mobile</span>
-                  <span class="meta-value">
-                    <a href="tel:${dialerPhone}" class="phone-link" onclick="event.stopPropagation();">${printablePhone}</a>
-                  </span>
-                </div>
-                <div class="meta-row"><span class="meta-label">Total Savings</span><span class="meta-value-savings">${formattedSavings}</span></div>
-              </div>
+        <section>
+          <div class="section-title">Expense Overview</div>
+          <div class="card">
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              <div><div class="metric-label">Total Expenses</div><div class="metric-value negative" id="expenseTotal">৳0</div></div>
+              <div><div class="metric-label">Top Expense Category</div><div class="metric-value" id="topExpenseCategory">-</div></div>
+              <div><div class="metric-label">Expense Entries</div><div class="metric-value" id="expenseCount">0</div></div>
+              <div><div class="metric-label">Category Breakdown</div><div class="metric-value" id="expenseBreakdown">-</div></div>
             </div>
-          `;
-        }).join('');
-      }
+          </div>
+        </section>
 
-      function performSearch(query) {
-        const cleanQuery = query.trim();
-        clearBtn.style.display = cleanQuery === '' ? 'none' : 'flex';
-        if (loading) loading.classList.remove('hidden');
+        <section>
+          <div class="section-title">Recent Transactions</div>
+          <div class="card overflow-x-auto">
+            <table class="min-w-full text-sm">
+              <thead class="text-left text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th class="py-3 pr-4">Date</th>
+                  <th class="py-3 pr-4">Member</th>
+                  <th class="py-3 pr-4">Amount</th>
+                  <th class="py-3 pr-4">Type</th>
+                  <th class="py-3 pr-4">Method</th>
+                </tr>
+              </thead>
+              <tbody id="recentTransactions" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
+            </table>
+          </div>
+        </section>
 
-        fetch(`${APPS_SCRIPT_WEBAPP_URL}?q=${encodeURIComponent(cleanQuery)}`)
-          .then(response => response.json())
-          .then(data => renderResults(data))
-          .catch(error => {
-            console.error("Inbound directory query failure:", error);
-            if (loading) loading.classList.add('hidden');
-            container.innerHTML = '<div class="status-message" style="color:#ef4444;">Error accessing data directory.</div>';
-          });
-      }
+        <section>
+          <div class="section-title">Quick Actions</div>
+          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <a href="entry.html" class="card block">New Entry</a>
+            <a href="members.html" class="card block">Add Member</a>
+            <a href="monthly-report.html" class="card block">Monthly Report</a>
+            <a href="#" class="card block">Export Data</a>
+          </div>
+        </section>
+      </main>
+    </div>
 
-      function debounce(func, delay) {
-        let timeoutId;
-        return (...args) => {
-          clearTimeout(timeoutId);
-          timeoutId = setTimeout(() => func(...args), delay);
-        };
-      }
+    <nav class="bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
+      <div class="grid grid-cols-5 gap-1 text-xs font-medium">
+        <a href="index.html" class="bottom-nav-item active">Home</a>
+        <a href="monthly-report.html" class="bottom-nav-item">Report</a>
+        <a href="members.html" class="bottom-nav-item">Members</a>
+        <a href="entry.html" class="bottom-nav-item">Entry</a>
+        <a href="settings.html" class="bottom-nav-item">Settings</a>
+      </div>
+    </nav>
 
-      searchInput.addEventListener('input', debounce((e) => performSearch(e.target.value), 300));
-      
-      clearBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        performSearch('');
-        searchInput.focus();
-      });
-
-      closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
-      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
-
-      performSearch('');
-    });
-
-    // Replace the service worker block at the bottom with this version:
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js')
-          .then(reg => {
-            console.log('Service Worker Registered.', reg.scope);
-            
-            // Listen for a newly pushed update
-            reg.onupdatefound = () => {
-              const installingWorker = reg.installing;
-              installingWorker.onstatechange = () => {
-                if (installingWorker.state === 'installed') {
-                  if (navigator.serviceWorker.controller) {
-                    // New version successfully downloaded in background; flash-reload the app!
-                    console.log('New layout update detected. Hot swapping assets...');
-                    window.location.reload();
-                  }
-                }
-              };
-            };
-          })
-          .catch(err => console.error('Service Worker Registration Failed:', err));
-      });
-    }
-  </script>
-</body>
+    <script src="script.js"></script>
+  </body>
 </html>
