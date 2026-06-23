@@ -1,111 +1,1148 @@
-<!doctype html>
-<html lang="en" class="h-full">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <title>FIC Staff Portal</title>
-  </head>
-  <body class="h-full bg-slate-100 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-20 border-b border-white/10 bg-white/80 px-4 py-4 backdrop-blur dark:bg-slate-950/80">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div class="flex items-center justify-between gap-3 sm:justify-start">
-            <div>
-              <h1 class="text-xl font-semibold">FIC Dashboard</h1>
-              <p class="text-sm text-slate-500 dark:text-slate-400">All-time financial overview</p>
-            </div>
-          </div>
-        </div>
-      </header>
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIC Staff Portal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Anek+Bangla:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+/* ═══ THEME TOKENS ═══ */
+:root {
+  --bg0:#f8fafc; --bg1:#ffffff; --bg2:#f1f5f9; --bg3:#e2e8f0;
+  --bdr:#e2e8f0;
+  --t1:#0f172a; --t2:#475569; --t3:#64748b; --t4:#94a3b8;
+  --acc:#2563eb; --acc-bg:#eff6ff; --acc-txt:#1d4ed8; --acc-bdr:#bfdbfe;
+  --ok-bg:#dcfce7; --ok-txt:#15803d;
+  --warn-bg:#fef3c7; --warn-txt:#b45309;
+  --danger-bg:#fef2f2; --danger-txt:#dc2626;
+  --purple:#7c3aed; --amber:#f59e0b;
+  --teal:#0d9488;
+  --phone-ring:#0f172a;
+  --nav-bg:#ffffff;
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+}
+[data-theme="dark"] {
+  --bg0:#0f172a; --bg1:#1e293b; --bg2:#263348; --bg3:#334155;
+  --bdr:#334155;
+  --t1:#f1f5f9; --t2:#cbd5e1; --t3:#94a3b8; --t4:#475569;
+  --acc:#3b82f6; --acc-bg:#172554; --acc-txt:#93c5fd; --acc-bdr:#1e40af;
+  --ok-bg:#052e16; --ok-txt:#4ade80;
+  --warn-bg:#431407; --warn-txt:#fbbf24;
+  --danger-bg:#3b0000; --danger-txt:#f87171;
+  --purple:#a78bfa; --amber:#fbbf24;
+  --teal:#2dd4bf;
+  --phone-ring:#334155;
+  --nav-bg:#1e293b;
+  --shadow:0 1px 3px rgba(0,0,0,.3);
+}
+/* ═══ RESET ═══ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:'Inter',sans-serif;background:#cbd5e1;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:2rem 1rem;transition:background .3s;}
+body[data-theme="dark"]{background:#020617;}
+/* ═══ PHONE FRAME ═══ */
+#fw{position:relative;width:390px;max-width:100%;height:800px;background:var(--bg0);border-radius:40px;border:9px solid var(--phone-ring);overflow:hidden;display:flex;flex-direction:column;transition:background .25s,border-color .25s;}
+.bn{font-family:'Anek Bangla',sans-serif;}
+/* ═══ STATUS BAR ═══ */
+.statusBar{display:flex;justify-content:space-between;align-items:center;padding:10px 22px 2px;font-size:13px;font-weight:600;color:var(--t1);flex-shrink:0;background:var(--bg1);transition:background .25s,color .25s;}
+/* ═══ HEADER ═══ */
+.appHeader{padding:8px 16px 10px;background:var(--bg1);border-bottom:1px solid var(--bdr);flex-shrink:0;transition:background .25s,border-color .25s;}
+.appHeader .hTop{display:flex;justify-content:space-between;align-items:center;}
+.appHeader .hTitle{font-size:16px;font-weight:700;color:var(--t1);}
+.appHeader .hSub{font-size:11px;color:var(--t3);margin-top:1px;}
+/* ═══ ROLE PILL ═══ */
+.rolePill{display:flex;background:var(--bg3);border-radius:999px;padding:3px;gap:2px;transition:background .25s;}
+.roleBtn{border:none;background:none;font-size:11px;font-weight:600;padding:5px 11px;border-radius:999px;color:var(--t3);cursor:pointer;font-family:inherit;transition:background .15s,color .15s;}
+.roleBtn.on{background:var(--acc);color:#fff;}
+/* ═══ SCROLL ═══ */
+#scScroll{flex:1;overflow-y:auto;overscroll-behavior:contain;}
+#scScroll::-webkit-scrollbar{width:3px;}
+#scScroll::-webkit-scrollbar-thumb{background:var(--bdr);border-radius:3px;}
+/* ═══ NAV ═══ */
+#bottomNav{flex-shrink:0;display:flex;border-top:1px solid var(--bdr);background:var(--nav-bg);transition:background .25s,border-color .25s;}
+.navBtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 0 10px;background:none;border:none;color:var(--t4);font-size:10px;font-family:inherit;cursor:pointer;transition:color .15s;}
+.navBtn.on{color:var(--acc);}
+/* ═══ CHIPS ═══ */
+.chip{font-size:12px;padding:5px 11px;border-radius:999px;border:1px solid var(--bdr);background:var(--bg1);color:var(--t2);cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s,color .15s,border-color .15s;}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff;}
+/* ═══ SEG TABS ═══ */
+.segBtn{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;color:var(--t3);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;font-family:inherit;transition:color .15s,border-color .15s;}
+.segBtn.on{color:var(--acc);border-bottom-color:var(--acc);}
+/* ═══ INPUTS ═══ */
+#fw input,#fw select{font-size:13px;padding:7px 9px;border:1px solid var(--bdr);border-radius:8px;background:var(--bg1);color:var(--t1);font-family:inherit;width:100%;transition:background .2s,color .2s,border-color .2s;}
+#fw input:focus,#fw select:focus{outline:none;border-color:var(--acc);}
+#fw label.fl{font-size:11px;color:var(--t3);font-weight:500;margin-bottom:3px;display:block;}
+/* ═══ MEMBER CARD ═══ */
+.mCard{display:block;width:100%;text-align:left;background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:10px 12px;cursor:pointer;font-family:inherit;margin-bottom:7px;transition:background .15s,border-color .15s;}
+.mCard:active{background:var(--bg2);}
+/* ═══ AVATAR ═══ */
+.avatar{width:36px;height:36px;border-radius:50%;background:var(--acc-bg);color:var(--acc-txt);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0;}
+/* ═══ PILL BADGES ═══ */
+.pillPaid{font-size:10px;padding:2px 8px;border-radius:999px;background:var(--ok-bg);color:var(--ok-txt);font-weight:600;white-space:nowrap;}
+.pillDue{font-size:10px;padding:2px 8px;border-radius:999px;background:var(--warn-bg);color:var(--warn-txt);font-weight:600;white-space:nowrap;}
+/* ═══ ICON BTNS ═══ */
+.iconBtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;background:var(--bg2);border:none;border-radius:12px;padding:8px 0;color:var(--acc);font-size:10px;cursor:pointer;font-family:inherit;text-decoration:none;transition:background .15s;}
+/* ═══ CARD ═══ */
+.card{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;padding:12px;transition:background .25s,border-color .25s;}
+/* ═══ PROGRESS BAR ═══ */
+.progTrack{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:2px;}
+.progFill{height:100%;border-radius:2px;transition:width .3s;}
+/* ═══ BATCH ═══ */
+.bRow{display:flex;align-items:center;gap:5px;padding:5px 0;border-bottom:1px solid var(--bg2);}
+.bRow:last-child{border-bottom:none;}
+.bRow.has-amt{background:linear-gradient(90deg,var(--ok-bg) 0,transparent 8px);}
+.bRow.unchecked{opacity:.4;}
+.bRow.unchecked .amtInput,.bRow.unchecked .rcvBtn,.bRow.unchecked .mthSel{pointer-events:none;}
+.rowChk{width:16px;height:16px;accent-color:var(--acc);cursor:pointer;flex-shrink:0;}
+.rcvToggle{display:flex;border:1px solid var(--bdr);border-radius:6px;overflow:hidden;flex-shrink:0;}
+.rcvToggle.ov .rcvBtn.on{background:var(--purple);}
+.rcvBtn{border:none;background:var(--bg2);color:var(--t3);font-size:10px;font-weight:600;padding:3px 5px;cursor:pointer;font-family:'Anek Bangla',sans-serif;line-height:1.3;transition:background .12s,color .12s;}
+.rcvBtn.on{background:var(--acc);color:#fff;}
+.rcvBtn:first-child{border-right:1px solid var(--bdr);}
+.mthSel{width:60px!important;font-size:10px!important;padding:3px 2px 3px 4px!important;border-radius:6px!important;color:var(--t1)!important;appearance:auto;height:28px;flex-shrink:0;}
+.mthSel.ov{border-color:var(--amber)!important;background:var(--warn-bg)!important;}
+.amtInput{width:58px!important;text-align:right;padding:4px!important;font-size:11px!important;border:1px solid var(--bdr);border-radius:7px;background:var(--bg1);color:var(--t1);font-family:inherit;flex-shrink:0;}
+/* ═══ MODE BTNS ═══ */
+.modeBtn{flex:1;text-align:center;padding:8px 0;font-size:12px;font-weight:600;color:var(--t3);background:var(--bg2);border:none;cursor:pointer;font-family:inherit;transition:background .15s,color .15s;}
+.modeBtn.on{background:var(--acc);color:#fff;}
+.modeBtn:first-child{border-radius:8px 0 0 8px;}
+.modeBtn:last-child{border-radius:0 8px 8px 0;}
+/* ═══ SETTINGS ═══ */
+.settingSection{background:var(--bg1);border:1px solid var(--bdr);border-radius:14px;overflow:hidden;margin-bottom:14px;transition:background .25s,border-color .25s;}
+.sectionHead{font-size:10px;font-weight:700;color:var(--t4);padding:10px 14px 4px;letter-spacing:.8px;text-transform:uppercase;}
+.settingRow{display:flex;align-items:center;padding:12px 14px;border-top:1px solid var(--bg2);gap:10px;}
+.settingRow:first-of-type{border-top:none;}
+.sLabel{font-size:13px;font-weight:500;color:var(--t1);flex:1;}
+.sSub{font-size:11px;color:var(--t3);}
+.themeGroup,.langGroup{display:flex;gap:8px;padding:8px 14px 14px;}
+.themeBtn,.langBtn{flex:1;border:1.5px solid var(--bdr);background:var(--bg2);border-radius:10px;padding:9px 4px;font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:5px;transition:border-color .15s,color .15s,background .15s;}
+.themeBtn.on,.langBtn.on{border-color:var(--acc);color:var(--acc);background:var(--acc-bg);}
+/* ═══ DRAWER ═══ */
+#shOv{position:absolute;inset:0;background:rgba(15,23,42,.5);opacity:0;pointer-events:none;transition:opacity .25s;z-index:5;}
+#shDrw{position:absolute;left:0;right:0;bottom:0;height:86%;background:var(--bg1);border-radius:16px 16px 0 0;transform:translateY(100%);transition:transform .3s cubic-bezier(.16,1,.3,1);overflow-y:auto;z-index:6;padding:8px 16px 20px;transition:transform .3s cubic-bezier(.16,1,.3,1),background .25s;}
+.drawerHandle{width:32px;height:4px;background:var(--bdr);border-radius:2px;margin:0 auto 10px;}
+/* ═══ TOAST ═══ */
+#ficToast{position:absolute;left:50%;bottom:76px;transform:translateX(-50%);background:var(--t1);color:var(--bg1);font-size:12px;padding:7px 16px;border-radius:999px;opacity:0;transition:opacity .25s;pointer-events:none;white-space:nowrap;z-index:7;}
+/* ═══ ABOUT CARD ═══ */
+.aboutCard{background:linear-gradient(135deg,var(--acc) 0%,#1d4ed8 100%);border-radius:14px;padding:16px;color:#fff;margin-bottom:14px;display:flex;align-items:center;gap:12px;}
+.aboutLogo{width:44px;height:44px;background:rgba(255,255,255,.2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0;}
+/* ═══ STAT MINI ═══ */
+.statMini{background:var(--bg2);border-radius:9px;padding:9px 10px;}
+.statMini p:first-child{font-size:10px;color:var(--t3);}
+.statMini p:last-child{font-size:13px;font-weight:600;color:var(--t1);margin-top:1px;}
+</style>
+</head>
+<body>
 
-      <main class="space-y-8 p-4 pb-24 lg:p-6 lg:pb-6">
-        <section>
-          <div class="section-title flex flex-wrap items-center gap-3">
-            <span>Summary</span>
-          </div>
-          <div class="grid grid-cols-3 gap-4">
-            <div class="card"><div class="metric-label">Savings</div><div class="metric-value" id="savings">1,48,100 BDT</div></div>
-            <div class="card"><div class="metric-label">Bank Deposits</div><div class="metric-value positive" id="bankDeposits">9,573 BDT</div></div>
-            <div class="card"><div class="metric-label">Investment</div><div class="metric-value negative" id="investment">1,10,000 BDT</div></div>
-            <div class="card"><div class="metric-label">Total Members</div><div class="metric-value" id="totalMembers">48</div></div>
-            <div class="card"><div class="metric-label">Expense</div><div class="metric-value positive" id="Expense">৳0</div></div>
-            <div class="card"><div class="metric-label">Active Loans</div><div class="metric-value negative" id="activeLoans">৳0</div></div>
-          </div>
-        </section>
+<div id="fw">
+  <!-- Status Bar -->
+  <div class="statusBar">
+    <span>9:41</span>
+    <div style="display:flex;gap:5px;align-items:center;">
+      <i class="ti ti-antenna-bars-5" style="font-size:14px;"></i>
+      <i class="ti ti-wifi" style="font-size:14px;"></i>
+      <i class="ti ti-battery-4" style="font-size:14px;"></i>
+    </div>
+  </div>
 
-        <section>
-          <div class="section-title">Profit Block</div>
-          <div class="grid gap-4 md:grid-cols-3">
-            <div class="card"><div class="metric-label">Net Profit</div><div class="metric-value positive" id="profitNet">৳0</div><div class="metric-sub neutral">0% change</div></div>
-            <div class="card"><div class="metric-label">Monthly Profit</div><div class="metric-value positive" id="monthlyProfit">৳0</div></div>
-            <div class="card"><div class="metric-label">Yearly Profit</div><div class="metric-value positive" id="yearlyProfit">৳0</div></div>
-          </div>
-        </section>
+  <!-- App Header -->
+  <div class="appHeader">
+    <div class="hTop">
+      <div>
+        <p class="hTitle" id="appTitle">FIC Staff Portal</p>
+        <p class="hSub" id="appSub">৪৮ সদস্য · জুন ২০২৬</p>
+      </div>
+      <div class="rolePill">
+        <button class="roleBtn on" data-role="associate">Associate</button>
+        <button class="roleBtn" data-role="accountant">Accountant</button>
+      </div>
+    </div>
+  </div>
 
-        <section>
-          <div class="section-title">Loans Section</div>
-          <div class="grid gap-4 sm:grid-cols-3">
-            <div class="card"><div class="metric-label">Loans Given</div><div class="metric-value" id="loansGiven">৳0</div></div>
-            <div class="card"><div class="metric-label">Loans Recovered</div><div class="metric-value positive" id="loansRecovered">৳0</div></div>
-            <div class="card"><div class="metric-label">Overdue Loans</div><div class="metric-value negative" id="overdueLoans">৳0</div></div>
-          </div>
-        </section>
-
-        <section>
-          <div class="section-title">Expense Overview</div>
-          <div class="card">
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div><div class="metric-label">Total Expenses</div><div class="metric-value negative" id="expenseTotal">৳0</div></div>
-              <div><div class="metric-label">Top Expense Category</div><div class="metric-value" id="topExpenseCategory">-</div></div>
-              <div><div class="metric-label">Expense Entries</div><div class="metric-value" id="expenseCount">0</div></div>
-              <div><div class="metric-label">Category Breakdown</div><div class="metric-value" id="expenseBreakdown">-</div></div>
-            </div>
-          </div>
-        </section>
-
-        <section>
-          <div class="section-title">Recent Transactions</div>
-          <div class="card overflow-x-auto">
-            <table class="min-w-full text-sm">
-              <thead class="text-left text-slate-500 dark:text-slate-400">
-                <tr>
-                  <th class="py-3 pr-4">Date</th>
-                  <th class="py-3 pr-4">Member</th>
-                  <th class="py-3 pr-4">Amount</th>
-                  <th class="py-3 pr-4">Type</th>
-                  <th class="py-3 pr-4">Method</th>
-                </tr>
-              </thead>
-              <tbody id="recentTransactions" class="divide-y divide-slate-200 dark:divide-slate-800"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <section>
-          <div class="section-title">Quick Actions</div>
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <a href="entry.html" class="card block">New Entry</a>
-            <a href="members.html" class="card block">Add Member</a>
-            <a href="monthly-report.html" class="card block">Monthly Report</a>
-            <a href="#" class="card block">Export Data</a>
-          </div>
-        </section>
-      </main>
+  <!-- Screens -->
+  <div id="scScroll">
+    <!-- HOME -->
+    <div id="scHome" style="padding:0 14px 14px;">
+      <div style="position:relative;margin:8px 0;">
+        <i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t4);font-size:15px;"></i>
+        <input id="srch" type="text" placeholder="নাম / কোড / নম্বর..." aria-label="Search" style="padding-left:30px;">
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:8px;overflow-x:auto;padding-bottom:2px;">
+        <button class="chip on stChip" data-s="all" id="chipAll">সবাই</button>
+        <button class="chip stChip" data-s="paid" id="chipPaid">পরিশোধ</button>
+        <button class="chip stChip" data-s="due" id="chipDue">বাকি</button>
+      </div>
+      <p id="rCnt" style="margin:0 0 6px;font-size:11px;color:var(--t4);"></p>
+      <div id="mList"></div>
     </div>
 
-    <nav class="bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
-      <div class="grid grid-cols-5 gap-1 text-xs font-medium">
-        <a href="index.html" class="bottom-nav-item active">Home</a>
-        <a href="monthly-report.html" class="bottom-nav-item">Report</a>
-        <a href="members.html" class="bottom-nav-item">Members</a>
-        <a href="entry.html" class="bottom-nav-item">Entry</a>
-        <a href="settings.html" class="bottom-nav-item">Settings</a>
-      </div>
-    </nav>
+    <!-- DASHBOARD -->
+    <div id="scDash" style="display:none;padding:0 14px 14px;"></div>
 
-    <script src="script.js"></script>
-  </body>
+    <!-- ENTRY -->
+    <div id="scEntry" style="display:none;padding:0 14px 16px;"></div>
+
+    <!-- SETTINGS -->
+    <div id="scSettings" style="display:none;padding:0 14px 14px;"></div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div id="bottomNav">
+    <button class="navBtn on" data-screen="home" id="navHome">
+      <i class="ti ti-users" style="font-size:18px;"></i>
+      <span id="navHomeLbl">সদস্য</span>
+    </button>
+    <button class="navBtn" data-screen="dash" id="navDash">
+      <i class="ti ti-chart-bar" style="font-size:18px;"></i>
+      <span id="navDashLbl">হিসাব</span>
+    </button>
+    <button class="navBtn" data-screen="entry" id="navEntry" style="display:none;">
+      <i class="ti ti-circle-plus" style="font-size:18px;"></i>
+      <span id="navEntryLbl">এন্ট্রি</span>
+    </button>
+    <button class="navBtn" data-screen="settings" id="navSettings">
+      <i class="ti ti-settings" style="font-size:18px;"></i>
+      <span id="navSettingsLbl">সেটিং</span>
+    </button>
+  </div>
+
+  <!-- Sheet Overlay -->
+  <div id="shOv"></div>
+  <div id="shDrw">
+    <div class="drawerHandle"></div>
+    <div id="shBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div id="ficToast"></div>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ═══════════════════════════════════════
+   DATA
+═══════════════════════════════════════ */
+var members=[
+{c:'X072501',n:'তারাজুল',en:'Tarazul',addr:'নিশ্চিন্তপুর',j:'জুলাই/২৫',ph:'+601161672506',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'T072502',n:'ফরিদুল',en:'Faridul',addr:'তেকানি',j:'জুলাই/২৫',ph:'01720803922',role:'ব্যবস্থাপক',roleEn:'Manager',loan:0,total:3600,jun26:300},
+{c:'K072503',n:'তারেক',en:'Tarek',addr:'করমজা',j:'জুলাই/২৫',ph:'01747427105',role:'সহ হিসাবরক্ষক',roleEn:'Asst. Accountant',loan:0,total:3600,jun26:300},
+{c:'K072504',n:'অসেন',en:'Asen',addr:'করমজা',j:'জুলাই/২৫',ph:'01580709809',role:'ঋণ ও যোগাযোগ',roleEn:'Loan & Contact',loan:0,total:3600,jun26:300},
+{c:'K072505',n:'রবিউল',en:'Robiul',addr:'করমজা',j:'জুলাই/২৫',ph:'01756514645',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'H072506',n:'ফরহাদ',en:'Forhad',addr:'হরিখালী',j:'জুলাই/২৫',ph:'01767373173',role:'ট্রাস্টি',roleEn:'Trustee',loan:0,total:3600,jun26:300},
+{c:'N072507',n:'মেহেদী',en:'Mehedi',addr:'নামাজখালী',j:'জুলাই/২৫',ph:'01792498719',role:'সহ ব্যবস্থাপক',roleEn:'Vice Manager',loan:0,total:3300,jun26:0},
+{c:'T072508',n:'প্রিন্স',en:'Prince',addr:'তেকানি',j:'জুলাই/২৫',ph:'01611801468',role:'সম্পাদক',roleEn:'Secretary',loan:0,total:3600,jun26:300},
+{c:'N072509',n:'রাজীব',en:'Rajib',addr:'নামাজখালী',j:'জুলাই/২৫',ph:'01738701319',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'X072510',n:'রায়হান',en:'Raihan',addr:'গজারিয়া',j:'জুলাই/২৫',ph:'01758958118',role:'হিসাবরক্ষক',roleEn:'Accountant',loan:0,total:3300,jun26:0},
+{c:'X072511',n:'হালিম',en:'Halim',addr:'গজারিয়া',j:'জুলাই/২৫',ph:'01777308624',role:'সদস্য',roleEn:'Member',loan:0,total:4200,jun26:1500},
+{c:'X072512',n:'সুজন',en:'Sujon',addr:'দড়িহাঁসরাজ',j:'জুলাই/২৫',ph:'01614295729',role:'সদস্য',roleEn:'Member',loan:1500,total:2400,jun26:0},
+{c:'T072513',n:'তুষার',en:'Tushar',addr:'তেকানি',j:'জুলাই/২৫',ph:'01611241587',role:'বিনিয়োগ অনু:',roleEn:'Investment',loan:0,total:3600,jun26:600},
+{c:'K072514',n:'রাশেদ',en:'Rashed',addr:'করমজা',j:'জুলাই/২৫',ph:'01733251703',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'N072515',n:'লিখন',en:'Likhon',addr:'নামাজখালী',j:'জুলাই/২৫',ph:'01642890303',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'H072516',n:'ফাহাদ',en:'Fahad',addr:'হরিখালী',j:'জুলাই/২৫',ph:'01716531933',role:'ট্রাস্টি',roleEn:'Trustee',loan:0,total:3600,jun26:300},
+{c:'T072517',n:'মমিন',en:'Momin',addr:'তেকানি',j:'জুলাই/২৫',ph:'01767938034',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'T072518',n:'আলামিন',en:'Alamin',addr:'তেকানি',j:'জুলাই/২৫',ph:'01843829099',role:'বিনিয়োগ অনু:',roleEn:'Investment',loan:0,total:3600,jun26:300},
+{c:'H072519',n:'সেলিম',en:'Selim',addr:'হরিখালী',j:'জুলাই/২৫',ph:'01764266371',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'X072520',n:'বাপ্পি',en:'Bappi',addr:'সাতবেকি',j:'জুলাই/২৫',ph:'01302337811',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'H072521',n:'আরিফুল',en:'Ariful',addr:'হরিখালী',j:'জুলাই/২৫',ph:'01780267164',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'N072522',n:'মাহবুবুর',en:'Mahbubur',addr:'নামাজখালী',j:'জুলাই/২৫',ph:'01650180707',role:'সদস্য',roleEn:'Member',loan:0,total:3900,jun26:600},
+{c:'K072523',n:'লাবলু',en:'Lablu',addr:'করমজা',j:'জুলাই/২৫',ph:'01744656712',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'X082524',n:'আরিফুল ২',en:'Ariful 2',addr:'জামালপুর',j:'আগস্ট/২৫',ph:'01736765697',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'X082525',n:'সাগর',en:'Sagor',addr:'সাতবেকি',j:'আগস্ট/২৫',ph:'01888134494',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'X092526',n:'তামিরুল',en:'Tamirul',addr:'দড়িহাঁসরাজ',j:'সেপ্টে./২৫',ph:'01609113745',role:'সদস্য',roleEn:'Member',loan:0,total:1500,jun26:0},
+{c:'X092527',n:'ইমরান',en:'Imran',addr:'বগুড়া',j:'সেপ্টে./২৫',ph:'01875408474',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'X092528',n:'হীরা',en:'Hira',addr:'বগুড়া',j:'সেপ্টে./২৫',ph:'01613546725',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'N102529',n:'পান্না',en:'Panna',addr:'নামাজখালী',j:'অক্টো./২৫',ph:'01757075146',role:'সদস্য',roleEn:'Member',loan:0,total:2400,jun26:0},
+{c:'X012630',n:'শরিফুল',en:'Shariful',addr:'সাতবেকি',j:'জানু./২৬',ph:'01604326049',role:'সদস্য',roleEn:'Member',loan:0,total:1500,jun26:0},
+{c:'X022631',n:'ফেরদৌস',en:'Ferdous',addr:'সাতবেকি',j:'ফেব্রু./২৬',ph:'01703750814',role:'সদস্য',roleEn:'Member',loan:0,total:1500,jun26:300},
+{c:'X042632',n:'আব্দুর রহিম',en:'Abdur Rahim',addr:'সাতবেকি',j:'এপ্রিল/২৬',ph:'01618119320',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'X042633',n:'শাহাদত',en:'Shahadat',addr:'গজারিয়া',j:'এপ্রিল/২৬',ph:'01518702754',role:'সদস্য',roleEn:'Member',loan:0,total:3300,jun26:0},
+{c:'T042634',n:'শাহরিয়ার',en:'Shahriyar',addr:'তেকানি',j:'এপ্রিল/২৬',ph:'01719248918',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'T042635',n:'সুজাউল',en:'Sujawul',addr:'তেকানি',j:'এপ্রিল/২৬',ph:'01773111988',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'X042636',n:'শাকিল',en:'Shakil',addr:'গজারিয়া',j:'এপ্রিল/২৬',ph:'01787838281',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'H052637',n:'আলামিন পরামানিক',en:'Alamin P.',addr:'হরিখালী',j:'মে/২৬',ph:'01323036516',role:'সদস্য',roleEn:'Member',loan:0,total:300,jun26:0},
+{c:'X052638',n:'মোশারফ',en:'Mosharf',addr:'গজারিয়া',j:'মে/২৬',ph:'01772141283',role:'সদস্য',roleEn:'Member',loan:0,total:3000,jun26:0},
+{c:'X052639',n:'আব্দুর রহিম ২',en:'Abdur Rahim 2',addr:'সাতবেকি',j:'মে/২৬',ph:'01618119320',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:300},
+{c:'T052640',n:'জাহিদ',en:'Jahid',addr:'তেকানি',j:'মে/২৬',ph:'01316607184',role:'সদস্য',roleEn:'Member',loan:0,total:300,jun26:0},
+{c:'X052641',n:'সনি আহমেদ',en:'Soni Ahmed',addr:'নিশ্চিন্তপুর',j:'মে/২৬',ph:'60103980556',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:3600},
+{c:'X052642',n:'মাহি ইসলাম',en:'Mahi Islam',addr:'গজারিয়া',j:'মে/২৬',ph:'01580914040',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:0},
+{c:'X062643',n:'রহেদুজ্জামান',en:'Raheduzzaman',addr:'গজারিয়া',j:'জুন/২৬',ph:'01719077397',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:3600},
+{c:'K062644',n:'আলিফ',en:'Alif',addr:'করমজা',j:'জুন/২৬',ph:'01796919087',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:3600},
+{c:'X062645',n:'রাশেদ মিলন',en:'Rashed Milon',addr:'গজারিয়া',j:'জুন/২৬',ph:'8801610000474',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:3600},
+{c:'T062646',n:'কবির',en:'Kobir',addr:'তেকানি',j:'জুন/২৬',ph:'8801611241994',role:'সদস্য',roleEn:'Member',loan:0,total:3600,jun26:3600},
+{c:'T062647',n:'সামিউল',en:'Samiul',addr:'তেকানি',j:'জুন/২৬',ph:'01745055116',role:'সদস্য',roleEn:'Member',loan:0,total:300,jun26:300},
+{c:'X062648',n:'সুমন মিয়া',en:'Suman Mia',addr:'দড়িহাঁসরাজ',j:'জুন/২৬',ph:'01779129465',role:'সদস্য',roleEn:'Member',loan:0,total:500,jun26:500}
+];
+
+/* ═══════════════════════════════════════
+   TRANSLATIONS
+═══════════════════════════════════════ */
+var TR={
+  bn:{
+    appTitle:'FIC স্টাফ পোর্টাল',
+    appSub:'৪৮ সদস্য · জুন ২০২৬',
+    navMembers:'সদস্য', navDash:'হিসাব', navEntry:'এন্ট্রি', navSettings:'সেটিং',
+    srch:'নাম / কোড / নম্বর...',
+    filterAll:'সবাই', filterPaid:'পরিশোধ', filterDue:'বাকি',
+    showing:'দেখাচ্ছে', of:'/',
+    paidBadge:'paid', dueBadge:'বাকি',
+    /* dashboard */
+    cashSummary:'নগদ সারসংক্ষেপ', period:'জুন ২০২৬',
+    totalSavings:'সঞ্চিত অর্থের পরিমাণ',
+    collected:'সংগ্রহ', expenses:'খরচ', net:'নেট',
+    byMethod:'পদ্ধতি অনুযায়ী',
+    byAccountant:'হিসাবরক্ষক অনুযায়ী',
+    bankInv:'ব্যাংক ও বিনিয়োগ',
+    deposit:'জমা', withdrawal:'উত্তোলন',
+    loanDisbursed:'ঋণ বিতরণ', outstandingLoan:'বকেয়া ঋণ',
+    share:'Share',
+    direct:'সরাসরি', bkash:'বিকাশ', nagad:'নগদ', rocket:'রকেট', bank:'ব্যাংক',
+    /* entry */
+    newEntry:'নতুন এন্ট্রি',
+    tabBatch:'Batch (সবার)', tabSingle:'Single', tabExpense:'খরচ/লেনদেন',
+    batchModeTitle:'Batch mode',
+    batchModeHint:'ডিফল্ট সেট করুন → সব সদস্যের জন্য প্রযোজ্য। পরিমাণ লিখুন; প্রয়োজনে গ্রহণকারী বা পদ্ধতি পরিবর্তন করুন।',
+    defSettings:'ডিফল্ট সেটিং',
+    applyAll:'সবাইতে প্রয়োগ',
+    monthLabel:'মাস', defAmt:'ডিফল্ট পরিমাণ',
+    defReceiver:'ডিফল্ট গ্রহণকারী', defMethod:'ডিফল্ট পদ্ধতি',
+    colMember:'সদস্য', colReceiver:'গ্রহণকারী', colMethod:'পদ্ধতি', colAmount:'পরিমাণ ৳',
+    lgDefault:'ডিফল্ট', lgReceiverOv:'পরিবর্তিত গ্রহণকারী', lgMethodOv:'পরিবর্তিত পদ্ধতি',
+    entries:'এন্ট্রি', submitBatch:'Submit batch',
+    noAmt:'কোনো পরিমাণ লেখা হয়নি',
+    batchSaved:' টি এন্ট্রি সফলভাবে সেভ হয়েছে ✓',
+    /* single */
+    selectMember:'— বেছে নিন —',
+    amtLabel:'পরিমাণ (৳)',
+    receiverLabel:'গ্রহণকারী', methodLabel:'পদ্ধতি',
+    noteLabel:'মন্তব্য (ঐচ্ছিক)', notePlaceholder:'বিশেষ নোট...',
+    saveBtn:'Save', saved:'সেভ হয়েছে ✓',
+    /* expense */
+    subjectLabel:'বিষয়', descLabel:'বিবরণ', descPh:'সংক্ষিপ্ত বিবরণ...',
+    expTab:'খরচ', bankTab:'ব্যাংক', loanTab:'ঋণ',
+    typeLabel:'ধরন', commentPh:'মন্তব্য...',
+    expCats:['মুদ্রণ খরচ','পরিবহন','আপ্যায়ন','স্টেশনারি','অন্যান্য'],
+    bankTypes:['ব্যাংকে জমা','ব্যাংক থেকে উত্তোলন','বিনিয়োগ'],
+    loanTypes:['ঋণ বিতরণ','ঋণ পরিশোধ'],
+    months:['জুন ২০২৬','মে ২০২৬','এপ্রিল ২০২৬'],
+    methods:['বিকাশ','নগদ','রকেট','সরাসরি','ব্যাংক'],
+    rcv1:'তারেক', rcv2:'রায়হান',
+    rcv1Short:'তা', rcv2Short:'রা',
+    /* settings */
+    settingsTitle:'সেটিংস',
+    displaySection:'ডিসপ্লে',
+    languageLabel:'ভাষা', themeLabel:'থিম',
+    langBn:'বাংলা', langEn:'English',
+    themeDark:'ডার্ক', themeLight:'লাইট', themeSystem:'সিস্টেম',
+    aboutSection:'অ্যাপ তথ্য',
+    versionLabel:'সংস্করণ', membersLabel:'মোট সদস্য', periodLabel:'সময়কাল',
+    appliedAll:'সব সদস্যে ডিফল্ট প্রযোজ্য করা হয়েছে',
+    /* profile sheet */
+    totalSavingsLabel:'মোট সঞ্চয়',
+    fullHistory:'পূর্ণ ইতিহাস দেখুন ↗',
+    paymentDue:'জুন ২০২৬ — এখনো পরিশোধ হয়নি',
+    addrLabel:'ঠিকানা', mobileLabel:'মোবাইল', joinedLabel:'যোগদান',
+    loanBadge:'ঋণ', juneLabel:'জুন ২০২৬',
+    call:'কল', whatsapp:'WhatsApp', email:'Email', maps:'Maps',
+  },
+  en:{
+    appTitle:'FIC Staff Portal',
+    appSub:'48 Members · June 2026',
+    navMembers:'Members', navDash:'Summary', navEntry:'Entry', navSettings:'Settings',
+    srch:'Name / Code / Phone...',
+    filterAll:'All', filterPaid:'Paid', filterDue:'Due',
+    showing:'Showing', of:'/',
+    paidBadge:'paid', dueBadge:'due',
+    /* dashboard */
+    cashSummary:'Cash Summary', period:'June 2026',
+    totalSavings:'Total Savings',
+    collected:'Collected', expenses:'Expenses', net:'Net',
+    byMethod:'By Method',
+    byAccountant:'By Accountant',
+    bankInv:'Bank & Investment',
+    deposit:'Deposit', withdrawal:'Withdrawal',
+    loanDisbursed:'Loan Disbursed', outstandingLoan:'Outstanding Loan',
+    share:'Share',
+    direct:'Direct', bkash:'bKash', nagad:'Nagad', rocket:'Rocket', bank:'Bank',
+    /* entry */
+    newEntry:'New Entry',
+    tabBatch:'Batch (All)', tabSingle:'Single', tabExpense:'Expense/Txn',
+    batchModeTitle:'Batch mode',
+    batchModeHint:'Set defaults → applies to all members. Enter each amount; override receiver or method per row if needed.',
+    defSettings:'Default Settings',
+    applyAll:'Apply to All',
+    monthLabel:'Month', defAmt:'Default Amount',
+    defReceiver:'Default Receiver', defMethod:'Default Method',
+    colMember:'Member', colReceiver:'Receiver', colMethod:'Method', colAmount:'Amount ৳',
+    lgDefault:'Default', lgReceiverOv:'Changed receiver', lgMethodOv:'Changed method',
+    entries:'entries', submitBatch:'Submit batch',
+    noAmt:'No amounts entered',
+    batchSaved:' entries saved ✓',
+    /* single */
+    selectMember:'— Select —',
+    amtLabel:'Amount (৳)',
+    receiverLabel:'Received by', methodLabel:'Method',
+    noteLabel:'Note (optional)', notePlaceholder:'Special note...',
+    saveBtn:'Save', saved:'Saved ✓',
+    /* expense */
+    subjectLabel:'Subject', descLabel:'Description', descPh:'Brief description...',
+    expTab:'Expense', bankTab:'Bank', loanTab:'Loan',
+    typeLabel:'Type', commentPh:'Comment...',
+    expCats:['Printing','Transport','Refreshment','Stationery','Other'],
+    bankTypes:['Bank Deposit','Bank Withdrawal','Investment'],
+    loanTypes:['Loan Disbursed','Loan Repayment'],
+    months:['June 2026','May 2026','April 2026'],
+    methods:['bKash','Nagad','Rocket','Direct','Bank'],
+    rcv1:'Tarek', rcv2:'Raihan',
+    rcv1Short:'Ta', rcv2Short:'Ra',
+    /* settings */
+    settingsTitle:'Settings',
+    displaySection:'Display',
+    languageLabel:'Language', themeLabel:'Theme',
+    langBn:'বাংলা', langEn:'English',
+    themeDark:'Dark', themeLight:'Light', themeSystem:'System',
+    aboutSection:'About',
+    versionLabel:'Version', membersLabel:'Total Members', periodLabel:'Period',
+    appliedAll:'Defaults applied to all members',
+    /* profile sheet */
+    totalSavingsLabel:'Total Savings',
+    fullHistory:'View full history ↗',
+    paymentDue:'June 2026 — Not yet paid',
+    addrLabel:'Address', mobileLabel:'Mobile', joinedLabel:'Joined',
+    loanBadge:'Loan', juneLabel:'June 2026',
+    call:'Call', whatsapp:'WhatsApp', email:'Email', maps:'Maps',
+  }
+};
+
+/* ═══════════════════════════════════════
+   STATE
+═══════════════════════════════════════ */
+var appState={
+  lang:'bn',
+  theme:'system',
+  role:'associate',
+  screen:'home',
+  entryTab:'batch',
+  expTab:'exp'
+};
+
+var batchState=[];
+members.forEach(function(){
+  batchState.push({amt:0,rcv:null,mth:null,rcvOv:false,mthOv:false,sel:true});
+});
+// init with defaults
+function initBatch(){
+  var defR=getDefRcv(), defM=getDefMth();
+  batchState.forEach(function(s){s.rcv=defR;s.mth=defM;});
+}
+
+/* ═══════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════ */
+function t(k){return TR[appState.lang][k]||k;}
+function ini(s){return (s||'').split(' ').map(function(w){return w[0]||'';}).slice(0,2).join('').toUpperCase()||'?';}
+function getDefRcv(){var b=document.querySelector('.byBChip.on');return b?b.getAttribute('data-v'):(t('rcv1'));}
+function getDefMth(){var s=document.getElementById('bDefMeth');return s?s.value:(t('methods')[0]);}
+function getDefAmt(){var v=document.getElementById('bDefAmt');return v?(parseInt(v.value)||300):300;}
+
+function showToast(msg){
+  var el=document.getElementById('ficToast');
+  el.textContent=msg; el.style.opacity='1';
+  clearTimeout(window._ft);
+  window._ft=setTimeout(function(){el.style.opacity='0';},2200);
+}
+
+/* ═══════════════════════════════════════
+   THEME
+═══════════════════════════════════════ */
+function applyTheme(mode){
+  var fw=document.getElementById('fw');
+  var html=document.documentElement;
+  var body=document.body;
+  var resolved=mode;
+  if(mode==='system'){
+    resolved=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';
+  }
+  [fw,html,body].forEach(function(el){el.setAttribute('data-theme',resolved);});
+}
+
+function setTheme(mode){
+  appState.theme=mode;
+  applyTheme(mode);
+  // Update buttons
+  document.querySelectorAll('.themeBtn').forEach(function(b){
+    b.classList.toggle('on',b.getAttribute('data-th')===mode);
+  });
+}
+
+/* watch system pref changes */
+if(window.matchMedia){
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){
+    if(appState.theme==='system') applyTheme('system');
+  });
+}
+
+/* ═══════════════════════════════════════
+   LANGUAGE
+═══════════════════════════════════════ */
+function applyLang(){
+  var l=appState.lang;
+  document.documentElement.lang=l;
+  document.getElementById('appTitle').textContent=t('appTitle');
+  document.getElementById('appSub').textContent=t('appSub');
+  document.getElementById('navHomeLbl').textContent=t('navMembers');
+  document.getElementById('navDashLbl').textContent=t('navDash');
+  document.getElementById('navEntryLbl').textContent=t('navEntry');
+  document.getElementById('navSettingsLbl').textContent=t('navSettings');
+  document.getElementById('srch').placeholder=t('srch');
+  document.getElementById('chipAll').textContent=t('filterAll');
+  document.getElementById('chipPaid').textContent=t('filterPaid');
+  document.getElementById('chipDue').textContent=t('filterDue');
+  // Re-render active screen
+  renderScreen(appState.screen);
+  renderList();
+}
+
+/* ═══════════════════════════════════════
+   SCREEN ROUTER
+═══════════════════════════════════════ */
+function showScreen(s){
+  appState.screen=s;
+  ['home','dash','entry','settings'].forEach(function(id){
+    document.getElementById('sc'+id.charAt(0).toUpperCase()+id.slice(1)).style.display='none';
+  });
+  var scMap={home:'scHome',dash:'scDash',entry:'scEntry',settings:'scSettings'};
+  var el=document.getElementById(scMap[s]);
+  if(el) el.style.display='block';
+  document.querySelectorAll('.navBtn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-screen')===s);});
+  document.getElementById('scScroll').scrollTop=0;
+  renderScreen(s);
+}
+
+function renderScreen(s){
+  if(s==='dash') renderDash();
+  if(s==='entry') renderEntry();
+  if(s==='settings') renderSettings();
+}
+
+/* ═══════════════════════════════════════
+   MEMBER LIST
+═══════════════════════════════════════ */
+function renderList(){
+  var q=document.getElementById('srch').value.trim();
+  var sFilter=document.querySelector('.stChip.on').getAttribute('data-s');
+  var fl=members.filter(function(m){
+    var nm=appState.lang==='en'?m.en:m.n;
+    var match=!q||(nm.toLowerCase().indexOf(q.toLowerCase())>-1||m.c.toLowerCase().indexOf(q.toLowerCase())>-1||m.ph.indexOf(q)>-1||m.n.indexOf(q)>-1);
+    var paid=m.jun26>0;
+    var ms=sFilter==='all'||(sFilter==='paid'&&paid)||(sFilter==='due'&&!paid);
+    return match&&ms;
+  });
+  document.getElementById('rCnt').textContent=t('showing')+' '+fl.length+' '+t('of')+' 48';
+  var el=document.getElementById('mList'); el.innerHTML='';
+  fl.forEach(function(m){
+    var paid=m.jun26>0;
+    var nm=appState.lang==='en'?m.en:m.n;
+    var rl=appState.lang==='en'?m.roleEn:m.role;
+    var pill=paid?'<span class="pillPaid">৳'+m.jun26+' '+t('paidBadge')+'</span>':'<span class="pillDue">'+t('dueBadge')+'</span>';
+    var btn=document.createElement('button');
+    btn.className='mCard';
+    btn.setAttribute('data-c',m.c);
+    btn.innerHTML='<div style="display:flex;gap:9px;align-items:flex-start;">'+
+      '<div class="avatar bn">'+ini(m.n)+'</div>'+
+      '<div style="flex:1;min-width:0;">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;">'+
+          '<p class="bn" style="margin:0;font-size:13px;font-weight:600;color:var(--t1);">'+m.n+(appState.lang==='en'&&nm!==m.n?' <span style="color:var(--t3);font-size:11px;">('+nm+')</span>':'')+'</p>'+pill+
+        '</div>'+
+        '<p style="margin:1px 0 2px;font-size:10px;color:var(--t4);">'+m.c+' · '+m.addr+' · '+rl+'</p>'+
+        '<p style="margin:0;font-size:11px;color:var(--acc);">'+m.ph+'</p>'+
+      '</div></div>';
+    btn.addEventListener('click',function(){openSheet(m.c);});
+    el.appendChild(btn);
+  });
+}
+
+/* ═══════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════ */
+function renderDash(){
+  var c=document.getElementById('scDash');
+  c.innerHTML='<div style="padding-top:4px;">'+
+  '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">'+
+    '<div><p style="margin:0;font-size:14px;font-weight:700;color:var(--t1);">'+t('cashSummary')+'</p>'+
+         '<p style="margin:0;font-size:10px;color:var(--t4);">'+t('period')+'</p></div>'+
+    '<button class="iconBtn" style="flex-direction:row;padding:7px 10px;gap:5px;font-size:11px;"><i class="ti ti-share-2" style="font-size:14px;"></i>'+t('share')+'</button>'+
+  '</div>'+
+  '<div style="background:var(--acc-bg);border:1px solid var(--acc-bdr);border-radius:12px;padding:14px;margin-bottom:10px;">'+
+    '<p style="margin:0;font-size:11px;color:var(--acc-txt);font-weight:500;">'+t('totalSavings')+'</p>'+
+    '<p style="margin:3px 0 0;font-size:26px;font-weight:800;color:var(--acc-txt);">৳১,৪৭,৮০০</p>'+
+  '</div>'+
+  '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:10px;">'+
+    '<div class="statMini"><p>'+t('collected')+'</p><p>৳২৬,৯০০</p></div>'+
+    '<div class="statMini"><p>'+t('expenses')+'</p><p>৳১,৫০০</p></div>'+
+    '<div class="statMini" style="background:var(--ok-bg);"><p style="color:var(--ok-txt);">'+t('net')+'</p><p style="color:var(--ok-txt);">+৳২৫,৪০০</p></div>'+
+  '</div>'+
+  '<div class="card" style="margin-bottom:10px;">'+
+    '<p style="margin:0 0 9px;font-size:12px;font-weight:700;color:var(--t1);">'+t('byMethod')+'</p>'+
+    mkBar(t('direct'),'৳৫,৮০০',22)+
+    mkBar(t('bkash'),'৳৪০,৪০০',100)+
+    mkBar(t('nagad'),'৳৩৩,৬০০',83)+
+    mkBar(t('rocket'),'৳৬৭,১০০',100,'var(--teal)')+
+  '</div>'+
+  '<div class="card" style="margin-bottom:10px;">'+
+    '<p style="margin:0 0 9px;font-size:12px;font-weight:700;color:var(--t1);">'+t('byAccountant')+'</p>'+
+    mkBar(t('rcv1'),'৳৭২,৮০০',97)+
+    mkBar(t('rcv2'),'৳৭৫,০০০',100)+
+  '</div>'+
+  '<div class="card">'+
+    '<p style="margin:0 0 9px;font-size:12px;font-weight:700;color:var(--t1);">'+t('bankInv')+'</p>'+
+    '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;">'+
+      '<div><p style="font-size:10px;color:var(--t3);">'+t('deposit')+'</p><p style="font-size:13px;font-weight:600;color:var(--t1);margin-top:1px;">৳১০,০০০</p></div>'+
+      '<div><p style="font-size:10px;color:var(--t3);">'+t('withdrawal')+'</p><p style="font-size:13px;font-weight:600;color:var(--t1);margin-top:1px;">৳০</p></div>'+
+      '<div><p style="font-size:10px;color:var(--t3);">'+t('loanDisbursed')+'</p><p style="font-size:13px;font-weight:600;color:var(--t1);margin-top:1px;">৳১,৫০০</p></div>'+
+      '<div><p style="font-size:10px;color:var(--ok-txt);">'+t('outstandingLoan')+'</p><p style="font-size:13px;font-weight:600;color:var(--ok-txt);margin-top:1px;">৳১,৫০০</p></div>'+
+    '</div>'+
+  '</div></div>';
+}
+
+function mkBar(label,val,pct,color){
+  return '<div style="margin-bottom:7px;">'+
+    '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--t2);margin-bottom:3px;" class="bn">'+
+      '<span>'+label+'</span><span>'+val+'</span>'+
+    '</div>'+
+    '<div class="progTrack"><div class="progFill" style="width:'+pct+'%;background:'+(color||'var(--acc)')+'"></div></div>'+
+  '</div>';
+}
+
+/* ═══════════════════════════════════════
+   ENTRY SCREEN
+═══════════════════════════════════════ */
+function renderEntry(){
+  var c=document.getElementById('scEntry');
+  c.innerHTML=
+    '<p style="margin:8px 0 10px;font-size:14px;font-weight:700;color:var(--t1);">'+t('newEntry')+'</p>'+
+    '<div style="display:flex;border-bottom:1px solid var(--bdr);margin-bottom:12px;" id="entryTabBar">'+
+      '<button class="segBtn'+(appState.entryTab==='batch'?' on':'')+'" data-etab="batch">'+t('tabBatch')+'</button>'+
+      '<button class="segBtn'+(appState.entryTab==='single'?' on':'')+'" data-etab="single">'+t('tabSingle')+'</button>'+
+      '<button class="segBtn'+(appState.entryTab==='expense'?' on':'')+'" data-etab="expense">'+t('tabExpense')+'</button>'+
+    '</div>'+
+    '<div id="pBatch" style="'+(appState.entryTab==='batch'?'':'display:none;')+'">'+buildBatch()+'</div>'+
+    '<div id="pSingle" style="'+(appState.entryTab==='single'?'':'display:none;')+'">'+buildSingle()+'</div>'+
+    '<div id="pExpense" style="'+(appState.entryTab==='expense'?'':'display:none;')+'">'+buildExpense()+'</div>';
+
+  /* tab listeners */
+  c.querySelectorAll('[data-etab]').forEach(function(b){
+    b.addEventListener('click',function(){
+      appState.entryTab=b.getAttribute('data-etab');
+      c.querySelectorAll('[data-etab]').forEach(function(x){x.classList.toggle('on',x===b);});
+      c.querySelector('#pBatch').style.display=appState.entryTab==='batch'?'block':'none';
+      c.querySelector('#pSingle').style.display=appState.entryTab==='single'?'block':'none';
+      c.querySelector('#pExpense').style.display=appState.entryTab==='expense'?'block':'none';
+    });
+  });
+  wireBatch(); wireSingle(); wireExpense();
+}
+
+/* ── BATCH ── */
+function buildBatch(){
+  var ms=t('methods');
+  return '<div style="background:var(--acc-bg);border:1px solid var(--acc-bdr);border-radius:10px;padding:9px 12px;margin-bottom:10px;">'+
+    '<p style="margin:0 0 2px;font-size:12px;font-weight:600;color:var(--acc-txt);"><i class="ti ti-info-circle"></i> '+t('batchModeTitle')+'</p>'+
+    '<p style="margin:0;font-size:11px;color:var(--acc);">'+t('batchModeHint')+'</p>'+
+  '</div>'+
+  '<div class="card" style="margin-bottom:6px;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">'+
+      '<p style="margin:0;font-size:12px;font-weight:600;color:var(--t1);">'+t('defSettings')+'</p>'+
+      '<button id="applyAllBtn" style="font-size:10px;padding:3px 9px;border:1px solid var(--acc);border-radius:999px;background:none;color:var(--acc);cursor:pointer;font-family:inherit;white-space:nowrap;">'+t('applyAll')+'</button>'+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-bottom:8px;">'+
+      '<div style="flex:1;"><label class="fl">'+t('monthLabel')+'</label>'+
+        '<select id="bMonth">'+ms.map(function(m,i){return '<option>'+t('months')[i]+'</option>';}).join('')+'</select></div>'+
+      '<div style="flex:1;"><label class="fl">'+t('defAmt')+'</label>'+
+        '<input id="bDefAmt" type="number" value="300" style="text-align:right;"></div>'+
+    '</div>'+
+    '<div style="display:flex;gap:14px;">'+
+      '<div style="flex:1;"><label class="fl">'+t('defReceiver')+'</label>'+
+        '<div style="display:flex;gap:6px;">'+
+          '<button class="chip on byBChip" data-v="'+t('rcv1')+'" style="font-size:11px;padding:4px 9px;">'+t('rcv1')+'</button>'+
+          '<button class="chip byBChip" data-v="'+t('rcv2')+'" style="font-size:11px;padding:4px 9px;">'+t('rcv2')+'</button>'+
+        '</div></div>'+
+      '<div style="flex:1;"><label class="fl">'+t('defMethod')+'</label>'+
+        '<select id="bDefMeth" style="font-size:12px;padding:5px 7px;">'+
+          ms.map(function(m){return '<option value="'+m+'">'+m+'</option>';}).join('')+
+        '</select></div>'+
+    '</div>'+
+  '</div>'+
+  '<div style="display:flex;align-items:center;gap:10px;padding:4px 2px 6px;font-size:10px;color:var(--t4);">'+
+    '<span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;background:var(--acc);border-radius:2px;display:inline-block;"></span>'+t('lgDefault')+'</span>'+
+    '<span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;background:var(--purple);border-radius:2px;display:inline-block;"></span>'+t('lgReceiverOv')+'</span>'+
+    '<span style="display:flex;align-items:center;gap:3px;"><span style="width:8px;height:8px;border:1.5px solid var(--amber);border-radius:2px;display:inline-block;"></span>'+t('lgMethodOv')+'</span>'+
+  '</div>'+
+  '<div class="card" style="overflow:hidden;padding:0;">'+
+    '<div style="display:flex;align-items:center;gap:5px;padding:7px 10px;background:var(--bg2);border-bottom:1px solid var(--bdr);">'+
+      '<input type="checkbox" id="chkAll" class="rowChk" checked>'+
+      '<p style="margin:0;font-size:10px;font-weight:600;color:var(--t3);flex:1;">'+t('colMember')+' <span id="selCount" style="color:var(--acc);font-weight:700;"></span></p>'+
+      '<p style="margin:0;font-size:10px;font-weight:600;color:var(--t3);width:46px;text-align:center;">'+t('colReceiver')+'</p>'+
+      '<p style="margin:0;font-size:10px;font-weight:600;color:var(--t3);width:60px;text-align:center;">'+t('colMethod')+'</p>'+
+      '<p style="margin:0;font-size:10px;font-weight:600;color:var(--t3);width:58px;text-align:right;">'+t('colAmount')+'</p>'+
+    '</div>'+
+    '<div id="batchList" style="padding:0 10px;"></div>'+
+  '</div>'+
+  '<div id="batchFooter" style="position:sticky;bottom:0;background:var(--bg0);padding:10px 0 4px;transition:background .25s;">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">'+
+      '<div style="font-size:11px;color:var(--t3);"><span id="bEntryCount" style="font-weight:700;color:var(--t1);">0</span> '+t('entries')+' &nbsp;·&nbsp; <span id="bRcvSplit" style="font-size:10px;"></span></div>'+
+      '<span style="font-size:15px;font-weight:800;color:var(--acc);">৳<span id="bTotal">0</span></span>'+
+    '</div>'+
+    '<div id="bMethBreak" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;min-height:16px;"></div>'+
+    '<button id="bSubmit" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;">'+t('submitBatch')+'</button>'+
+  '</div>';
+}
+
+function wireBatch(){
+  var container=document.getElementById('pBatch');
+  if(!container) return;
+
+  initBatch();
+  renderBatchList();
+
+  /* apply all */
+  var applyBtn=document.getElementById('applyAllBtn');
+  if(applyBtn) applyBtn.addEventListener('click',function(){
+    var dr=getDefRcv(), dm=getDefMth();
+    batchState.forEach(function(s){s.rcv=dr;s.mth=dm;s.rcvOv=false;s.mthOv=false;});
+    renderBatchList();
+    showToast(t('appliedAll'));
+  });
+
+  /* default receiver chips */
+  document.querySelectorAll('.byBChip').forEach(function(ch){
+    ch.addEventListener('click',function(){
+      document.querySelectorAll('.byBChip').forEach(function(x){x.classList.remove('on');});
+      ch.classList.add('on');
+      var dr=ch.getAttribute('data-v');
+      batchState.forEach(function(s){if(!s.rcvOv){s.rcv=dr;}});
+      document.querySelectorAll('#batchList .bRow').forEach(function(row){
+        var idx=parseInt(row.getAttribute('data-idx'));
+        var s=batchState[idx];
+        row.querySelectorAll('.rcvBtn').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-v')===s.rcv);});
+        row.querySelector('.rcvToggle').classList.toggle('ov',s.rcvOv);
+      });
+      updateBatchFooter();
+    });
+  });
+
+  /* default method select */
+  var bDefMeth=document.getElementById('bDefMeth');
+  if(bDefMeth) bDefMeth.addEventListener('change',function(){
+    var dm=this.value;
+    batchState.forEach(function(s){if(!s.mthOv){s.mth=dm;}});
+    document.querySelectorAll('#batchList .mthSel').forEach(function(sel){
+      var idx=parseInt(sel.getAttribute('data-idx'));
+      sel.value=batchState[idx].mth;
+      sel.classList.toggle('ov',batchState[idx].mthOv);
+    });
+    updateBatchFooter();
+  });
+
+  /* check all */
+  var chkAll=document.getElementById('chkAll');
+  if(chkAll) chkAll.addEventListener('change',function(){
+    var checked=this.checked;
+    batchState.forEach(function(s){s.sel=checked;});
+    document.querySelectorAll('#batchList .rowChk').forEach(function(c){c.checked=checked;});
+    document.querySelectorAll('#batchList .bRow').forEach(function(r){r.classList.toggle('unchecked',!checked);});
+    updateBatchFooter();
+  });
+
+  /* submit */
+  var bSubmit=document.getElementById('bSubmit');
+  if(bSubmit) bSubmit.addEventListener('click',function(){
+    var cnt=batchState.filter(function(s){return s.amt>0&&s.sel;}).length;
+    if(cnt===0){showToast(t('noAmt'));return;}
+    showToast(cnt+t('batchSaved'));
+  });
+}
+
+function renderBatchList(){
+  var bl=document.getElementById('batchList');
+  if(!bl) return;
+  bl.innerHTML='';
+  var ms=t('methods');
+  var selCnt=0;
+  members.forEach(function(m,i){
+    var s=batchState[i];
+    if(s.sel) selCnt++;
+    var row=document.createElement('div');
+    row.className='bRow'+(s.amt>0&&s.sel?' has-amt':'')+(s.sel?'':' unchecked');
+    row.setAttribute('data-idx',i);
+
+    row.innerHTML=
+      '<input type="checkbox" class="rowChk" data-idx="'+i+'" '+(s.sel?'checked':'')+' style="flex-shrink:0;">'+
+      '<div style="flex:1;min-width:0;overflow:hidden;">'+
+        '<p class="bn" style="margin:0;font-size:11px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+m.n+'</p>'+
+        '<p style="margin:0;font-size:9px;color:'+(m.jun26>0?'var(--ok-txt)':'var(--t4)')+';">'+(m.jun26>0?'✓ paid':'বাকি')+'</p>'+
+      '</div>'+
+      '<div class="rcvToggle'+(s.rcvOv?' ov':'')+'" style="flex-shrink:0;">'+
+        '<button class="rcvBtn'+(s.rcv===t('rcv1')?' on':'')+'" data-idx="'+i+'" data-v="'+t('rcv1')+'" title="'+t('rcv1')+'">'+t('rcv1Short')+'</button>'+
+        '<button class="rcvBtn'+(s.rcv===t('rcv2')?' on':'')+'" data-idx="'+i+'" data-v="'+t('rcv2')+'" title="'+t('rcv2')+'">'+t('rcv2Short')+'</button>'+
+      '</div>'+
+      '<select class="mthSel'+(s.mthOv?' ov':'')+'" data-idx="'+i+'" style="width:58px!important;"></select>'+
+      '<input class="amtInput" type="number" placeholder="—" data-idx="'+i+'" min="0" step="100" value="'+(s.amt>0?s.amt:'')+'" style="width:58px!important;">';
+
+    /* populate method select */
+    var sel=row.querySelector('.mthSel');
+    ms.forEach(function(mth){
+      var o=document.createElement('option');
+      o.value=mth; o.textContent=mth;
+      if(mth===s.mth) o.selected=true;
+      sel.appendChild(o);
+    });
+
+    /* row checkbox */
+    row.querySelector('.rowChk').addEventListener('change',function(e){
+      batchState[i].sel=e.target.checked;
+      row.classList.toggle('unchecked',!e.target.checked);
+      updateBatchFooter();
+      var allChecked=batchState.every(function(x){return x.sel;});
+      var chkAll=document.getElementById('chkAll');
+      if(chkAll) chkAll.checked=allChecked;
+    });
+
+    /* receiver toggle */
+    row.querySelectorAll('.rcvBtn').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var defRcv=getDefRcv();
+        batchState[i].rcv=btn.getAttribute('data-v');
+        batchState[i].rcvOv=(batchState[i].rcv!==defRcv);
+        row.querySelectorAll('.rcvBtn').forEach(function(b){b.classList.toggle('on',b===btn);});
+        row.querySelector('.rcvToggle').classList.toggle('ov',batchState[i].rcvOv);
+        updateBatchFooter();
+      });
+    });
+
+    /* method select */
+    sel.addEventListener('change',function(){
+      batchState[i].mth=sel.value;
+      batchState[i].mthOv=(sel.value!==getDefMth());
+      sel.classList.toggle('ov',batchState[i].mthOv);
+      updateBatchFooter();
+    });
+
+    /* amount input */
+    var amtInp=row.querySelector('.amtInput');
+    amtInp.addEventListener('input',function(){
+      batchState[i].amt=parseInt(amtInp.value)||0;
+      row.classList.toggle('has-amt',batchState[i].amt>0&&batchState[i].sel);
+      updateBatchFooter();
+    });
+
+    bl.appendChild(row);
+  });
+
+  var sc=document.getElementById('selCount');
+  if(sc) sc.textContent='('+selCnt+')';
+  updateBatchFooter();
+}
+
+function updateBatchFooter(){
+  var total=0, count=0, rcv1t=0, rcv2t=0;
+  var methMap={};
+  batchState.forEach(function(s){
+    if(s.amt>0&&s.sel){
+      total+=s.amt; count++;
+      if(s.rcv===t('rcv1')) rcv1t+=s.amt; else rcv2t+=s.amt;
+      methMap[s.mth]=(methMap[s.mth]||0)+s.amt;
+    }
+  });
+  var bTotal=document.getElementById('bTotal');
+  var bEC=document.getElementById('bEntryCount');
+  var bRS=document.getElementById('bRcvSplit');
+  var bMB=document.getElementById('bMethBreak');
+  if(bTotal) bTotal.textContent=total.toLocaleString('en-IN');
+  if(bEC) bEC.textContent=count;
+  if(bRS) bRS.textContent=count>0?t('rcv1')+' ৳'+rcv1t.toLocaleString('en-IN')+' · '+t('rcv2')+' ৳'+rcv2t.toLocaleString('en-IN'):'';
+  if(bMB){
+    bMB.innerHTML='';
+    Object.keys(methMap).forEach(function(k){
+      var sp=document.createElement('span');
+      sp.style.cssText='font-size:10px;background:var(--acc-bg);color:var(--acc-txt);padding:2px 7px;border-radius:999px;white-space:nowrap;';
+      sp.textContent=k+' ৳'+methMap[k].toLocaleString('en-IN');
+      bMB.appendChild(sp);
+    });
+  }
+}
+
+/* ── SINGLE ── */
+function buildSingle(){
+  var ms=t('methods');
+  var opts=members.map(function(m){return '<option value="'+m.c+'">'+m.n+' — '+m.c+'</option>';}).join('');
+  return '<div style="margin-bottom:8px;"><label class="fl">'+t('colMember')+'</label><select id="sMember"><option value="">'+t('selectMember')+'</option>'+opts+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('monthLabel')+'</label><select id="sMonth">'+t('months').map(function(m){return '<option>'+m+'</option>';}).join('')+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('amtLabel')+'</label><input id="sAmt" type="number" placeholder="300" style="text-align:right;"></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('receiverLabel')+'</label><div style="display:flex;gap:6px;">'+
+      '<button class="chip on bySChip" style="font-size:11px;">'+t('rcv1')+'</button>'+
+      '<button class="chip bySChip" style="font-size:11px;">'+t('rcv2')+'</button>'+
+    '</div></div>'+
+    '<div style="margin-bottom:12px;"><label class="fl">'+t('methodLabel')+'</label><div style="display:flex;gap:5px;flex-wrap:wrap;">'+
+      ms.map(function(m,i){return '<button class="chip'+(i===0?' on':'')+' mSChip" style="font-size:11px;">'+m+'</button>';}).join('')+
+    '</div></div>'+
+    '<div style="margin-bottom:12px;"><label class="fl">'+t('noteLabel')+'</label><input id="sNote" type="text" placeholder="'+t('notePlaceholder')+'"></div>'+
+    '<button id="sSave" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;">'+t('saveBtn')+'</button>';
+}
+
+function wireSingle(){
+  function sg(cls){
+    document.querySelectorAll('.'+cls).forEach(function(c){
+      c.addEventListener('click',function(){
+        document.querySelectorAll('.'+cls).forEach(function(x){x.classList.remove('on');});
+        c.classList.add('on');
+      });
+    });
+  }
+  sg('bySChip'); sg('mSChip');
+  var ss=document.getElementById('sSave');
+  if(ss) ss.addEventListener('click',function(){showToast(t('saved'));});
+}
+
+/* ── EXPENSE ── */
+function buildExpense(){
+  return '<div style="display:flex;border-bottom:1px solid var(--bdr);margin-bottom:10px;">'+
+    '<button class="segBtn'+(appState.expTab==='exp'?' on':'')+'" data-exptab="exp" style="font-size:11px;">'+t('expTab')+'</button>'+
+    '<button class="segBtn'+(appState.expTab==='bank'?' on':'')+'" data-exptab="bank" style="font-size:11px;">'+t('bankTab')+'</button>'+
+    '<button class="segBtn'+(appState.expTab==='loan'?' on':'')+'" data-exptab="loan" style="font-size:11px;">'+t('loanTab')+'</button>'+
+  '</div>'+
+  '<div id="pExp" style="'+(appState.expTab==='exp'?'':'display:none;')+'">'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('subjectLabel')+'</label><select>'+t('expCats').map(function(c){return '<option>'+c+'</option>';}).join('')+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('amtLabel')+'</label><input type="number" placeholder="200" style="text-align:right;"></div>'+
+    '<div style="margin-bottom:12px;"><label class="fl">'+t('descLabel')+'</label><input type="text" placeholder="'+t('descPh')+'"></div>'+
+    '<button id="expSave" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;">'+t('saveBtn')+'</button>'+
+  '</div>'+
+  '<div id="pBank" style="'+(appState.expTab==='bank'?'':'display:none;')+'">'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('typeLabel')+'</label><select>'+t('bankTypes').map(function(b){return '<option>'+b+'</option>';}).join('')+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('amtLabel')+'</label><input type="number" placeholder="10000" style="text-align:right;"></div>'+
+    '<div style="margin-bottom:12px;"><label class="fl">'+t('descLabel')+'</label><input type="text" placeholder="'+t('descPh')+'"></div>'+
+    '<button id="bankSave" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;">'+t('saveBtn')+'</button>'+
+  '</div>'+
+  '<div id="pLoan" style="'+(appState.expTab==='loan'?'':'display:none;')+'">'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('colMember')+'</label><select><option value="">'+t('selectMember')+'</option>'+members.map(function(m){return '<option>'+m.n+' — '+m.c+'</option>';}).join('')+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('typeLabel')+'</label><select>'+t('loanTypes').map(function(l){return '<option>'+l+'</option>';}).join('')+'</select></div>'+
+    '<div style="margin-bottom:8px;"><label class="fl">'+t('amtLabel')+'</label><input type="number" placeholder="1500" style="text-align:right;"></div>'+
+    '<div style="margin-bottom:12px;"><label class="fl">'+t('descLabel')+'</label><input type="text" placeholder="'+t('commentPh')+'"></div>'+
+    '<button id="loanSave" style="width:100%;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:12px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;">'+t('saveBtn')+'</button>'+
+  '</div>';
+}
+
+function wireExpense(){
+  var pExp=document.getElementById('pExpense');
+  if(!pExp) return;
+  pExp.querySelectorAll('[data-exptab]').forEach(function(b){
+    b.addEventListener('click',function(){
+      appState.expTab=b.getAttribute('data-exptab');
+      pExp.querySelectorAll('[data-exptab]').forEach(function(x){x.classList.toggle('on',x===b);});
+      pExp.querySelector('#pExp').style.display=appState.expTab==='exp'?'block':'none';
+      pExp.querySelector('#pBank').style.display=appState.expTab==='bank'?'block':'none';
+      pExp.querySelector('#pLoan').style.display=appState.expTab==='loan'?'block':'none';
+    });
+  });
+  ['expSave','bankSave','loanSave'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el) el.addEventListener('click',function(){showToast(t('saved'));});
+  });
+}
+
+/* ═══════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════ */
+function renderSettings(){
+  var c=document.getElementById('scSettings');
+  c.innerHTML=
+    '<div class="aboutCard">'+
+      '<div class="aboutLogo">F</div>'+
+      '<div>'+
+        '<p style="font-size:15px;font-weight:700;margin:0;">FIC Staff Portal</p>'+
+        '<p style="font-size:11px;opacity:.75;margin:2px 0 0;">v2.0 · Combined Edition</p>'+
+      '</div>'+
+    '</div>'+
+
+    /* Display section */
+    '<div class="settingSection">'+
+      '<p class="sectionHead">'+t('displaySection')+'</p>'+
+
+      /* Language */
+      '<div class="settingRow" style="border-top:none;flex-direction:column;align-items:flex-start;padding-bottom:0;">'+
+        '<p class="sLabel">'+t('languageLabel')+'</p>'+
+      '</div>'+
+      '<div class="langGroup">'+
+        '<button class="langBtn'+(appState.lang==='bn'?' on':'')+'" data-lang="bn">'+
+          '<span style="font-size:16px;">🇧🇩</span>'+
+          '<span class="bn" style="font-size:12px;">বাংলা</span>'+
+        '</button>'+
+        '<button class="langBtn'+(appState.lang==='en'?' on':'')+'" data-lang="en">'+
+          '<span style="font-size:16px;">🇬🇧</span>'+
+          '<span style="font-size:12px;">English</span>'+
+        '</button>'+
+      '</div>'+
+
+      /* Theme */
+      '<div class="settingRow" style="flex-direction:column;align-items:flex-start;padding-bottom:0;">'+
+        '<p class="sLabel">'+t('themeLabel')+'</p>'+
+      '</div>'+
+      '<div class="themeGroup">'+
+        '<button class="themeBtn'+(appState.theme==='dark'?' on':'')+'" data-th="dark">'+
+          '<span style="font-size:18px;">🌙</span>'+
+          '<span>'+t('themeDark')+'</span>'+
+        '</button>'+
+        '<button class="themeBtn'+(appState.theme==='light'?' on':'')+'" data-th="light">'+
+          '<span style="font-size:18px;">☀️</span>'+
+          '<span>'+t('themeLight')+'</span>'+
+        '</button>'+
+        '<button class="themeBtn'+(appState.theme==='system'?' on':'')+'" data-th="system">'+
+          '<span style="font-size:18px;">⚙️</span>'+
+          '<span>'+t('themeSystem')+'</span>'+
+        '</button>'+
+      '</div>'+
+    '</div>'+
+
+    /* About section */
+    '<div class="settingSection">'+
+      '<p class="sectionHead">'+t('aboutSection')+'</p>'+
+      '<div class="settingRow" style="border-top:none;">'+
+        '<p class="sLabel">'+t('versionLabel')+'</p>'+
+        '<p class="sSub">2.0.0</p>'+
+      '</div>'+
+      '<div class="settingRow">'+
+        '<p class="sLabel">'+t('membersLabel')+'</p>'+
+        '<p class="sSub" style="font-weight:600;color:var(--acc);">48</p>'+
+      '</div>'+
+      '<div class="settingRow">'+
+        '<p class="sLabel">'+t('periodLabel')+'</p>'+
+        '<p class="sSub bn">'+t('juneLabel')+'</p>'+
+      '</div>'+
+    '</div>';
+
+  /* lang buttons */
+  c.querySelectorAll('[data-lang]').forEach(function(b){
+    b.addEventListener('click',function(){
+      appState.lang=b.getAttribute('data-lang');
+      c.querySelectorAll('[data-lang]').forEach(function(x){x.classList.toggle('on',x===b);});
+      applyLang();
+    });
+  });
+
+  /* theme buttons */
+  c.querySelectorAll('[data-th]').forEach(function(b){
+    b.addEventListener('click',function(){
+      setTheme(b.getAttribute('data-th'));
+      c.querySelectorAll('[data-th]').forEach(function(x){x.classList.toggle('on',x.getAttribute('data-th')===appState.theme);});
+    });
+  });
+}
+
+/* ═══════════════════════════════════════
+   MEMBER SHEET
+═══════════════════════════════════════ */
+function openSheet(code){
+  var m=members.filter(function(x){return x.c===code;})[0];
+  if(!m) return;
+  var paid=m.jun26>0;
+  var due=!paid?'<div style="background:var(--warn-bg);color:var(--warn-txt);font-size:11px;padding:8px 10px;border-radius:9px;margin:8px 0;text-align:center;font-weight:600;">'+t('paymentDue')+'</div>':'';
+  var lnBadge=m.loan>0?'<span style="font-size:11px;padding:3px 8px;border-radius:999px;background:var(--warn-bg);color:var(--warn-txt);font-weight:600;">'+t('loanBadge')+': ৳'+m.loan+'</span>':'';
+  var phoneClean=m.ph.replace(/[^0-9]/g,'').replace(/^0/,'');
+  var waHref='https://wa.me/880'+phoneClean;
+
+  document.getElementById('shBody').innerHTML=
+    '<div style="display:flex;justify-content:flex-end;"><button id="cBtn" style="background:var(--bg2);border:none;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--t2);cursor:pointer;font-size:16px;">✕</button></div>'+
+    '<div style="text-align:center;margin-bottom:10px;">'+
+      '<div class="avatar bn" style="width:54px;height:54px;font-size:17px;font-weight:800;margin:0 auto 8px;">'+ini(m.n)+'</div>'+
+      '<p class="bn" style="margin:0;font-size:16px;font-weight:700;color:var(--t1);">'+m.n+'</p>'+
+      '<p style="margin:1px 0 0;font-size:11px;color:var(--t4);">'+m.c+' · '+m.j+'</p>'+
+      '<div style="display:flex;gap:6px;justify-content:center;margin-top:6px;">'+
+        '<span style="font-size:11px;padding:3px 8px;border-radius:999px;background:var(--acc-bg);color:var(--acc-txt);font-weight:500;" class="bn">'+m.role+'</span>'+
+        lnBadge+
+      '</div>'+
+    '</div>'+
+    due+
+    '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0;">'+
+      '<a class="iconBtn" href="tel:'+m.ph+'"><i class="ti ti-phone" style="font-size:17px;"></i>'+t('call')+'</a>'+
+      '<a class="iconBtn" href="'+waHref+'"><i class="ti ti-brand-whatsapp" style="font-size:17px;"></i>'+t('whatsapp')+'</a>'+
+      '<button class="iconBtn"><i class="ti ti-mail" style="font-size:17px;"></i>'+t('email')+'</button>'+
+      '<button class="iconBtn"><i class="ti ti-map-pin" style="font-size:17px;"></i>'+t('maps')+'</button>'+
+    '</div>'+
+    '<div class="card" style="margin-bottom:10px;">'+
+      mkDetailRow(t('addrLabel'),m.addr,true)+
+      mkDetailRow(t('mobileLabel'),'<span style="color:var(--acc);">'+m.ph+'</span>',false)+
+      mkDetailRow(t('joinedLabel'),m.j,true)+
+    '</div>'+
+    '<div class="card">'+
+      '<p style="margin:0;font-size:11px;color:var(--t3);">'+t('totalSavingsLabel')+'</p>'+
+      '<p style="margin:2px 0 8px;font-size:23px;font-weight:800;color:var(--t1);">৳'+m.total.toLocaleString('en-IN')+'</p>'+
+      '<div style="display:flex;justify-content:space-between;font-size:12px;padding:6px 0 0;border-top:1px solid var(--bg2);">'+
+        '<span style="color:var(--t3);">'+t('juneLabel')+'</span>'+
+        '<span style="font-weight:700;color:'+(paid?'var(--ok-txt)':'var(--warn-txt)')+';">'+(paid?'৳'+m.jun26:'—')+'</span>'+
+      '</div>'+
+    '</div>'+
+    '<button id="histBtn" style="width:100%;margin-top:10px;background:none;border:1px solid var(--bdr);border-radius:9px;padding:10px;font-size:12px;color:var(--acc);font-weight:500;font-family:inherit;cursor:pointer;">'+t('fullHistory')+'</button>';
+
+  document.getElementById('shOv').style.opacity='1';
+  document.getElementById('shOv').style.pointerEvents='auto';
+  document.getElementById('shDrw').style.transform='translateY(0)';
+  document.getElementById('cBtn').onclick=closeSheet;
+}
+
+function mkDetailRow(label,val,isLast){
+  return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;'+(isLast?'':'border-bottom:1px solid var(--bg2);')+'font-size:12px;">'+
+    '<span style="color:var(--t3);">'+label+'</span>'+
+    '<span class="bn" style="color:var(--t1);">'+val+'</span>'+
+  '</div>';
+}
+
+function closeSheet(){
+  document.getElementById('shOv').style.opacity='0';
+  document.getElementById('shOv').style.pointerEvents='none';
+  document.getElementById('shDrw').style.transform='translateY(100%)';
+}
+
+/* ═══════════════════════════════════════
+   EVENT WIRING
+═══════════════════════════════════════ */
+/* Nav */
+document.querySelectorAll('.navBtn').forEach(function(b){
+  b.addEventListener('click',function(){showScreen(b.getAttribute('data-screen'));});
+});
+
+/* Role switcher */
+document.querySelectorAll('.roleBtn').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('.roleBtn').forEach(function(x){x.classList.toggle('on',x===b);});
+    appState.role=b.getAttribute('data-role');
+    document.getElementById('navEntry').style.display=appState.role==='accountant'?'flex':'none';
+    if(appState.role==='associate'&&appState.screen==='entry') showScreen('home');
+  });
+});
+
+/* Status chips */
+document.querySelectorAll('.stChip').forEach(function(c){
+  c.addEventListener('click',function(){
+    document.querySelectorAll('.stChip').forEach(function(x){x.classList.toggle('on',x===c);});
+    renderList();
+  });
+});
+
+/* Search */
+document.getElementById('srch').addEventListener('input',renderList);
+
+/* Drawer overlay */
+document.getElementById('shOv').addEventListener('click',closeSheet);
+
+/* ═══════════════════════════════════════
+   INIT
+═══════════════════════════════════════ */
+applyTheme(appState.theme);
+renderList();
+renderDash();
+
+})();
+</script>
+</body>
 </html>
