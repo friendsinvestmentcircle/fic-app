@@ -14,23 +14,24 @@
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex items-center justify-between gap-3 sm:justify-start">
             <div>
-              <h1 class="text-xl font-semibold">Home Dashboard</h1>
+              <h1 class="text-xl font-semibold">FIC Dashboard</h1>
               <p class="text-sm text-slate-500 dark:text-slate-400">All-time financial overview</p>
             </div>
           </div>
-          <button id="themeBtn" class="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">Toggle Theme</button>
         </div>
       </header>
 
       <main class="space-y-8 p-4 pb-24 lg:p-6 lg:pb-6">
         <section>
-          <div class="section-title">Summary Cards</div>
-          <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            <div class="card"><div class="metric-label">Total Balance</div><div class="metric-value" id="totalBalance">৳0</div></div>
-            <div class="card"><div class="metric-label">Total Income</div><div class="metric-value positive" id="totalIncome">৳0</div></div>
-            <div class="card"><div class="metric-label">Total Expense</div><div class="metric-value negative" id="totalExpense">৳0</div></div>
-            <div class="card"><div class="metric-label">Net Profit</div><div class="metric-value positive" id="netProfit">৳0</div></div>
-            <div class="card"><div class="metric-label">Total Members</div><div class="metric-value" id="totalMembers">0</div></div>
+          <div class="section-title flex flex-wrap items-center gap-3">
+            <span>Summary</span>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="card"><div class="metric-label">Savings</div><div class="metric-value" id="savings">1,48,100 BDT</div></div>
+            <div class="card"><div class="metric-label">Bank Deposits</div><div class="metric-value positive" id="bankDeposits">9,573 BDT</div></div>
+            <div class="card"><div class="metric-label">Investment</div><div class="metric-value negative" id="investment">1,10,000 BDT</div></div>
+            <div class="card"><div class="metric-label">Total Members</div><div class="metric-value" id="totalMembers">48</div></div>
+            <div class="card"><div class="metric-label">Expense</div><div class="metric-value positive" id="Expense">৳0</div></div>
             <div class="card"><div class="metric-label">Active Loans</div><div class="metric-value negative" id="activeLoans">৳0</div></div>
           </div>
         </section>
