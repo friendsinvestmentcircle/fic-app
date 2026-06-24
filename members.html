@@ -1,45 +1,74 @@
-<!doctype html>
-<html lang="en" class="h-full">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <link rel="stylesheet" href="styles.css">
-    <title>Members</title>
-  </head>
-  <body class="h-full bg-slate-100 text-slate-900 transition-colors duration-300 dark:bg-slate-950 dark:text-slate-100">
-    <div class="min-h-screen">
-      <header class="sticky top-0 z-20 border-b border-white/10 bg-white/80 px-4 py-4 backdrop-blur dark:bg-slate-950/80">
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div class="flex items-center justify-between gap-3 sm:justify-start">
-            <div>
-              <h1 class="text-xl font-semibold">Members</h1>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Manage member profiles and transaction history</p>
-            </div>
-          </div>
-          <button id="themeBtn" class="rounded-xl border border-slate-200 px-3 py-2 text-sm dark:border-slate-700">Toggle Theme</button>
-        </div>
-      </header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIC Staff Portal – Members</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Anek+Bangla:wght@400;500;600&display=swap" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+</head>
+<body>
+  <div id="shOv"></div>
+  <div id="shDrw">
+    <div class="drawerHandle"></div>
+    <div id="shBody"></div>
+  </div>
+  <div id="ficToast"></div>
 
-      <div class="p-4 pb-24 lg:p-6 lg:pb-6">
-        <div class="mt-6 grid gap-4 xl:grid-cols-2">
-          <div class="card">Member List</div>
-          <div class="card">Member Profile View</div>
-          <div class="card xl:col-span-2">Transaction History</div>
-        </div>
+  <header class="appHeader">
+    <div class="hTop">
+      <div>
+        <p class="hTitle" id="appTitle">FIC Staff Portal</p>
+        <p class="hSub" id="appSub">48 Members · June 2026</p>
+      </div>
+      <div class="rolePill">
+        <button class="roleBtn on" data-role="associate">Associate</button>
+        <button class="roleBtn" data-role="accountant">Accountant</button>
       </div>
     </div>
+  </header>
 
-    <nav class="bottom-nav fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
-      <div class="grid grid-cols-5 gap-1 text-xs font-medium">
-        <a href="index.html" class="bottom-nav-item">Home</a>
-        <a href="monthly-report.html" class="bottom-nav-item">Report</a>
-        <a href="members.html" class="bottom-nav-item active">Members</a>
-        <a href="entry.html" class="bottom-nav-item">Entry</a>
-        <a href="settings.html" class="bottom-nav-item">Settings</a>
+  <main id="appContent">
+    <div id="scHome">
+      <div class="searchWrap">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="srch" type="text" placeholder="Name / Code / Phone..." aria-label="Search" />
       </div>
-    </nav>
+      <div class="filterChips">
+        <button class="chip on stChip" data-s="all">All</button>
+        <button class="chip stChip" data-s="paid">Paid</button>
+        <button class="chip stChip" data-s="due">Due</button>
+      </div>
+      <p id="rCnt" class="resultCount"></p>
+      <div id="mList"></div>
+    </div>
+  </main>
 
-    <script src="script.js"></script>
-  </body>
+  <nav id="bottomNav">
+    <a href="members.html" class="navBtn on" data-screen="home">
+      <i class="fa-solid fa-users"></i>
+      <span>Members</span>
+    </a>
+    <a href="index.html" class="navBtn" data-screen="dash">
+      <i class="fa-solid fa-chart-bar"></i>
+      <span>Summary</span>
+    </a>
+    <a href="entry.html" class="navBtn" id="navEntry" data-screen="entry" style="display:none;">
+      <i class="fa-solid fa-circle-plus"></i>
+      <span>Entry</span>
+    </a>
+    <a href="settings.html" class="navBtn" data-screen="settings">
+      <i class="fa-solid fa-gear fa-spin" style="--fa-animation-duration: 4s;"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initPage('home');
+    });
+  </script>
+</body>
 </html>
