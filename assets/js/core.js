@@ -56,24 +56,40 @@
      ═══════════════════════════════════════ */
 
   window.apiRequest = function(action, method, params) {
-    return new Promise(function(resolve, reject) {
-      var url = window.API.BASE_URL + '?action=' + action + '&key=' + window.API.SECRET_KEY;
-      
-      if (method === 'GET' && params) {
-        Object.keys(params).forEach(function(k) {
-          url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
-        });
-      }
-
+  return new Promise(function(resolve, reject) {
+    var url = API.BASE_URL + '?action=' + action + '&key=' + API.SECRET_KEY;
+    
+    if (method === 'GET' && params) {
+      Object.keys(params).forEach(function(k) {
+        url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
+      });
+    }
+    
+    // For GET requests, use JSONP (script tag) – works around CORS
+    if (method === 'GET') {
+      var script = document.createElement('script');
+      var callbackName = 'jsonp_callback_' + Date.now();
+      window[callbackName] = function(data) {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        resolve(data);
+      };
+      script.src = url + '&callback=' + callbackName;
+      script.onerror = function() {
+        delete window[callbackName];
+        document.body.removeChild(script);
+        reject(new Error('JSONP request failed'));
+      };
+      document.body.appendChild(script);
+    } else {
+      // For POST, use fetch with no-cors (won't read response)
+      // This will need a different solution later
       var options = {
         method: method,
         mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json'
-        }
+        headers: { 'Content-Type': 'application/json' }
       };
-
-      if (method === 'POST' && params) {
+      if (params) {
         options.body = JSON.stringify({
           action: action,
           key: window.API.SECRET_KEY,
@@ -83,22 +99,14 @@
           transaction: params.transaction || null
         });
       }
-
       fetch(url, options)
-        .then(function(response) {
-          if (!response.ok) {
-            throw new Error('HTTP ' + response.status);
-          }
-          return response.json();
+        .then(function() {
+          resolve({ success: true, message: 'Submitted (response not readable)' });
         })
-        .then(function(result) {
-          resolve(result);
-        })
-        .catch(function(error) {
-          reject(error);
-        });
-    });
-  };
+        .catch(reject);
+    }
+  });
+};
 
   /* ═══════════════════════════════════════
      TOAST NOTIFICATION
