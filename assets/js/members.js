@@ -54,6 +54,12 @@
     var container = document.getElementById('mList');
     if (!container) return;
 
+    // In members.js, after renderList(), re-bind the search input
+    var searchInput = document.getElementById('srch');
+    if (searchInput) {
+    searchInput.oninput = function() { renderList(); };
+    }
+
     var q = document.getElementById('srch') ? document.getElementById('srch').value.trim() : '';
     var filter = document.querySelector('.stChip.on') ? document.querySelector('.stChip.on').getAttribute('data-s') : 'all';
 
