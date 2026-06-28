@@ -1,14 +1,19 @@
 {
   "name": "FIC Staff Portal",
-  "short_name": "FIC App",
-  "start_url": "index.html",
+  "short_name": "FIC",
+  "description": "Microfinance management for FIC",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#2563eb",
-  "theme_color": "#2563eb",
-  "orientation": "portrait-primary",
+  "background_color": "#F6F8FA",
+  "theme_color": "#10A37F",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/583/583921.png",
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
