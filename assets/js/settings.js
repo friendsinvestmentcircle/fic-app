@@ -96,15 +96,34 @@
       });
     });
 
-    // Clear cache
-    var clearBtn = document.getElementById('clearCacheBtn');
-    if (clearBtn) {
-      clearBtn.addEventListener('click', function() {
-        window.Cache.clear();
-        window.showToast('Cache cleared');
-        updateCacheStatus();
+// In settings.js – this should already be there
+var clearBtn = document.getElementById('clearCacheBtn');
+if (clearBtn) {
+  clearBtn.addEventListener('click', function() {
+    // Clear localStorage cache
+    window.Cache.clear();
+    
+    // Clear service worker caches
+    if ('caches' in window) {
+      caches.keys().then(function(names) {
+        names.forEach(function(name) {
+          caches.delete(name);
+        });
       });
     }
+    
+    // Unregister service workers
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(reg) {
+          reg.unregister();
+        });
+      });
+    }
+    
+    window.showToast('Cache cleared – refresh the page');
+  });
+}
 
     // Update member count
     updateMemberCount();
