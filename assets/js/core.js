@@ -51,22 +51,22 @@
     }
   };
 
-  /* ═══════════════════════════════════════
-     API CALL
-     ═══════════════════════════════════════ */
+/* ═══════════════════════════════════════
+   API CALL
+   ═══════════════════════════════════════ */
 
-  window.apiRequest = function(action, method, params) {
+window.apiRequest = function(action, method, params) {
   return new Promise(function(resolve, reject) {
-    var url = API.BASE_URL + '?action=' + action + '&key=' + API.SECRET_KEY;
+    var url = window.API.BASE_URL + '?action=' + action + '&key=' + window.API.SECRET_KEY;
     
-    if (method === 'GET' && params) {
+    if (params) {
       Object.keys(params).forEach(function(k) {
         url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(params[k]);
       });
     }
     
     // For GET requests, use JSONP (script tag) – works around CORS
-    if (method === 'GET') {
+    if (method === 'GET' || !method) {
       var script = document.createElement('script');
       var callbackName = 'jsonp_callback_' + Date.now();
       window[callbackName] = function(data) {
@@ -83,7 +83,6 @@
       document.body.appendChild(script);
     } else {
       // For POST, use fetch with no-cors (won't read response)
-      // This will need a different solution later
       var options = {
         method: method,
         mode: 'no-cors',
