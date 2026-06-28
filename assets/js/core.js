@@ -8,7 +8,7 @@
   
   window.API = {
     // ⚠️ REPLACE THIS WITH YOUR DEPLOYED APPS SCRIPT URL
-    BASE_URL: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
+    BASE_URL: 'https://script.google.com/macros/s/AKfycbxKmLb8IPy_ZDvg2jZE3veJxHgcNjJD7_LTPgwj1jw9KL7p4Lq8P6wItMqf7YhB5AZOBA/exec',
     SECRET_KEY: 'FIC2025$ecretKey'
   };
 
