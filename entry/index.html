@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FIC Staff Portal – Entry</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@latest/css/phosphor.css" />
+  <link rel="manifest" href="../manifest.json" />
+</head>
+<body>
+  <div id="shOv"></div>
+  <div id="shDrw">
+    <div class="drawerHandle"></div>
+    <div id="shBody"></div>
+  </div>
+  <div id="ficToast"></div>
+  <div id="loadingOverlay"></div>
+
+  <header class="appHeader">
+    <div class="hTop">
+      <div>
+        <p class="hTitle" id="appTitle">FIC Staff Portal</p>
+        <p class="hSub" id="appSub">Loading...</p>
+      </div>
+      <div class="rolePill">
+        <button class="roleBtn on" data-role="associate">Associate</button>
+        <button class="roleBtn" data-role="accountant">Accountant</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="appContent">
+    <div id="scEntry"></div>
+  </main>
+
+  <nav id="bottomNav">
+    <a href="../" class="navBtn" data-screen="home">
+      <i class="ph-thin ph-house"></i>
+      <span>Home</span>
+    </a>
+    <a href="../members/" class="navBtn" data-screen="members">
+      <i class="ph-thin ph-users"></i>
+      <span>Members</span>
+    </a>
+    <a href="../entry/" class="navBtn on" id="navEntry" data-screen="entry" style="display:none;">
+      <i class="ph-fill ph-plus-circle"></i>
+      <span>Entry</span>
+    </a>
+    <a href="../settings/" class="navBtn" data-screen="settings">
+      <i class="ph-thin ph-gear"></i>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <script src="../assets/js/core.js"></script>
+  <script src="../assets/js/entry-batch.js"></script>
+  <script src="../assets/js/entry-single.js"></script>
+  <script src="../assets/js/entry-expense.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      initEntry();
+      initThemeAndLang();
+    });
+  </script>
+</body>
+</html>
